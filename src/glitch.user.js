@@ -2,10 +2,10 @@
 // @name         Read Wikipedia when waiting for Glitch apps to start
 // @namespace    http://tampermonkey.net/
 // @version      0.1
-// @description  try to take over the world!
+// @description  More fun than doodling in one color
 // @author       ggorlen
-// @match        http://*.glitch.me/
-// @match        https://*.glitch.me/
+// @match        http://*.glitch.me/*
+// @match        https://*.glitch.me/*
 // @grant        none
 // ==/UserScript==
 
