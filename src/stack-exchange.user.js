@@ -5,28 +5,32 @@
 // @description  Offers one-click votes and hides noisy features
 // @author       ggorlen
 // @match        https://stackoverflow.com/questions*
+// @match        https://stackoverflow.com/review*
+// @match        https://meta.stackoverflow.com/questions*
 // @match        https://askubuntu.com/questions*
+// @match        https://superuser.com/questions*
 // @include      /https://.*?\.stackexchange\.com/questions*
 // @grant        none
 // ==/UserScript==
 
 // TODO
-// - script to auto-cast delete votes on posts I've closed
-// - "show 1 comment" should be clicked with a MutationObserver
-// - VTC with custom reason
-// - add (1) for votes other people have cast for a particular reason (might be more trouble than its worth)
-// - make sure downvotes don't toggle on shift-clicks
-// - auto-click to accept reopen popups and other prompts.
-// - don't show retract link if post is closed.
-// - voting then retracting shouldn't re-show links if possible.
-// - when someone else edits the post, prevent links from disappearing. maybe move close links container elsewhere (not so easy, it turns out)?
-// - casting offsite (and possibly other types) of close votes on old posts gives a 500 response.
+// - separate script to auto-cast delete votes on posts I've closed
+// - show OP's acceptance percentage and other stats on their question page
+// - make it work on review queues
+// - "show 1 comment" or "1 new answer" should be auto-clicked with a MutationObserver
+// - add (1) for votes other people have cast for a particular reason
+// - auto-click to accept reopen popups and other prompts
+// - shortcut to VTC with custom reason
+// - voting then retracting shouldn't re-show links after refreshing the page
+// - when someone else edits the question, prevent VTC links from disappearing. maybe move close links container elsewhere (not so easy, it turns out)?
+// - vim keybindings using CodeMirror or Ace for stack snippets
 
 // REFS
 // - https://stackoverflow.com/questions/20462544/greasemonkey-tampermonkey-match-for-a-page-with-parameters
 // - https://github.com/CertainPerformance/Stack-Exchange-Userscripts
 
 const removeAll = els => [...els].forEach(e => e.remove());
+const tryRm = el => el && el.remove();
 
 const flashErr = msg => {
   console.error(msg);
@@ -91,30 +95,25 @@ const postRetractVote = (onSuccess, onError) => {
   post(url, formData, onSuccess, onError);
 };
 
+const shouldAddVoteContainer = () =>
+  window.StackExchange.options.user.rep >= 3000 &&
+  document.querySelector(".js-post-menu") &&
+  document.querySelector(".my-profile") &&
+  !document.querySelector("#question.deleted-answer")
+;
+
 const shouldAddVoteLinks = () => {
-  const myProfile = document.querySelector(".my-profile");
-
-  if (!myProfile || window.StackExchange.options.user.rep < 3000) {
-    return false;
-  }
-
-  const closeQuestionLink = document.querySelector(".close-question-link");
-
-  if (!closeQuestionLink ||
-    document.querySelector('#question.deleted-answer') ||
-    closeQuestionLink.textContent === "reopen" ||
-    closeQuestionLink.title.includes("You voted")) {
-     return false;
-  }
-
-  return true;
+  const closeQuestionLink = document.querySelector(".js-close-question-link");
+  return closeQuestionLink &&
+    !/reopen/i.test(closeQuestionLink.textContent) &&
+    !/you voted/i.test(closeQuestionLink.title);
 };
 
 const onSuccess = response => {
   if (response.Success) {
     removeAll(document.querySelectorAll(".userscript-vote"));
-    const closeLink = document.querySelector(".close-question-link");
-    closeLink.innerText = `close (${response.Count || 0})`;
+    const closeLink = document.querySelector(".js-close-question-link");
+    closeLink.innerText = `Close (${response.Count || 0})`;
 
     if (response.ResultChangedState) {
       window.location.href = window.location.href;
@@ -136,6 +135,20 @@ const addRetractLink = container => {
     event.preventDefault();
     postRetractVote(onSuccess, flashErr);
   });
+};
+
+const addVoteContainer = () => {
+  const container = document.createElement("div");
+  container.className = "userscript-vote-container";
+  document.querySelector(".js-post-menu")
+    .parentNode.prepend(container);
+
+  if (shouldAddVoteLinks()) {
+    addVoteLinks(container);
+  }
+  else {
+    addRetractLink(container);
+  }
 };
 
 const addVoteLinks = container => {
@@ -210,7 +223,7 @@ const addVoteLinks = container => {
   a.innerText = "dupe";
   a.className = "userscript-vote";
   a.addEventListener("click", async event => {
-    document.querySelector(".close-question-link").click();
+    document.querySelector(".js-close-question-link").click();
     const dupeRadioSel = "#closeReasonId-Duplicate";
 
     for (let i = 0; i++ < 9 && !document.querySelector(dupeRadioSel);) {
@@ -222,32 +235,16 @@ const addVoteLinks = container => {
   });
 };
 
-(function () {
-  document.querySelector(".s-sidebarwidget").remove();
-  removeAll(document.querySelectorAll(".user-gravatar32"));
-  const container = document.createElement("div");
-  container.className = "userscript-vote-container";
-  document.querySelector(".post-menu")
-      .parentNode.prepend(container);
-  //remove(document.querySelector(".list-reset"));
 
-  if (shouldAddVoteLinks()) {
-    addVoteLinks(container);
-  }
-  else {
-    addRetractLink(container);
-  }
-
-  document.querySelector("footer").remove();
-
+const addStyleSheet = () => {
   const css = `
 .userscript-vote-container {
-  margin: 0px 16px 0px 0px;
+  margin: 0;
 }
 .userscript-vote {
   display: inline-block;
   font-size: 1em;
-  padding: 0 4px 2px;
+  padding: 5px 5px 5px 0;
   color: #848d95;
 }
 .userscript-vote:hover {
@@ -264,15 +261,34 @@ const addVoteLinks = container => {
   }
 
   document.querySelector("head").appendChild(style);
+};
 
+const tryCloseWelcomeBackBanner = () =>
   setTimeout(() => { // TODO MutationObserver
     const overlay = document.querySelector("#overlay-header");
     const msg = "Welcome back! If you found this question useful";
-
+  
     if (overlay && overlay.innerText.includes(msg) &&
       overlay.querySelector(".close-overlay")) {
       overlay.querySelector(".close-overlay").click();
     }
-  }, 1000);
+  }, 1000)
+;
+
+(() => {
+  removeAll(document.querySelectorAll(".user-gravatar32"));
+  tryRm(document.querySelector(".s-sidebarwidget"));
+  tryRm(document.getElementsByClassName("-marketing-link js-gps-track js-products-menu")[0]);
+  tryRm(document.getElementsByClassName("-main grid--cell")[0]);
+  tryRm(document.querySelector(".ml12"));
+  tryRm(document.querySelector(".bottom-notice"));
+  tryRm(document.querySelector("footer"));
+
+  if (shouldAddVoteContainer()) {
+    addVoteContainer();
+  }
+  
+  addStyleSheet();
+  tryCloseWelcomeBackBanner();
 })();
 
