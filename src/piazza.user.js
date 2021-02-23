@@ -38,7 +38,7 @@
     helpfulPosts.forEach(function (el) {
       el.offsetParent !== null && el.click();
     });
-  }, 10000);
+  }, 5000);
 
   setTimeout(function () {
     new MutationObserver(function (mutations) {
