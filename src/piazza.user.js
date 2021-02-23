@@ -24,18 +24,20 @@
   var markHelpful = throttle(function () {
     var xp =`
       //div[contains(text(), "Jonathan Lao")]/../../../..
-      //a[normalize-space()="thanks!" or
-          normalize-space()="helpful!"]
+      //a[contains(@class, do_good_answer) and 
+          (normalize-space()="thanks!" or
+           normalize-space()="helpful!")]
     `;
     var xpResult = document.evaluate(xp, document);
     var helpfulPosts = [];
 
-    for (var nextEl; nextEl = xpResult.iterateNext();
-       helpfulPosts.push(nextEl));
+    for (var nextEl; 
+         nextEl = xpResult.iterateNext();
+         helpfulPosts.push(nextEl));
 
-    helpfulPosts.forEach(e => {
+    helpfulPosts.forEach(function (el) {
       try {
-        e.click();
+        el && el.offsetParent !== null && el.click();
       }
       catch (err) {}
     });
