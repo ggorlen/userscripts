@@ -36,10 +36,7 @@
          helpfulPosts.push(nextEl));
 
     helpfulPosts.forEach(function (el) {
-      try {
-        el && el.offsetParent !== null && el.click();
-      }
-      catch (err) {}
+      el.offsetParent !== null && el.click();
     });
   }, 10000);
 
