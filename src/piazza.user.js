@@ -11,17 +11,18 @@
 (function () {
   function throttle(func, timeFrame) {
     var lastTime = 0;
-    return function () {
+    return function (...args) {
       var now = new Date();
 
       if (now - lastTime >= timeFrame) {
-        func();
+        func(...args);
         lastTime = now;
       }
     };
   }
 
   var markHelpful = throttle(function () {
+    // not quite working TODO
     var xp =`
       //div[contains(text(), "Jonathan Lao")]/../../../..
       //a[contains(@class, do_good_answer) and 
@@ -31,8 +32,7 @@
     var xpResult = document.evaluate(xp, document);
     var helpfulPosts = [];
 
-    for (var nextEl; 
-         nextEl = xpResult.iterateNext();
+    for (var nextEl; nextEl = xpResult.iterateNext();
          helpfulPosts.push(nextEl));
 
     helpfulPosts.forEach(function (el) {

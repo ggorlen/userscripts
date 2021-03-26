@@ -37,7 +37,16 @@
       // hide yt logo
       selector: () => document.querySelector("#logo"),
       onFound: el => (el.style.display = "none")
-    },/*
+    },
+    {
+      // click through promo
+      selector: () => {
+        const xp = `//*[@id="text" and normalize-space()="No thanks"]`;
+        return document.evaluate(xp, document).iterateNext();
+      },
+      onFound: el => el.click()
+    },
+    /*
     {
       // expand 'show more'
       selector: () => {
