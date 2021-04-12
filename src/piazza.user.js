@@ -11,28 +11,33 @@
 (function () {
   function throttle(func, timeFrame) {
     var lastTime = 0;
-    return function (...args) {
+    return function () {
       var now = new Date();
 
       if (now - lastTime >= timeFrame) {
-        func(...args);
+        func();
         lastTime = now;
       }
     };
   }
 
   var markHelpful = throttle(function () {
+    /*
+      // Hide Joel's posts -- could be used for fixing JLao below
+      for (let element of document.getElementsByClassName('user_name_hq581s7b5Jd')) { element.closest('[data-pats=reply], [data-pats=followup]').style.display = 'none'; }
+    */
     // not quite working TODO
     var xp =`
       //div[contains(text(), "Jonathan Lao")]/../../../..
-      //a[contains(@class, do_good_answer) and 
+      //a[contains(@class, do_good_answer) and
           (normalize-space()="thanks!" or
            normalize-space()="helpful!")]
     `;
     var xpResult = document.evaluate(xp, document);
     var helpfulPosts = [];
 
-    for (var nextEl; nextEl = xpResult.iterateNext();
+    for (var nextEl;
+         nextEl = xpResult.iterateNext();
          helpfulPosts.push(nextEl));
 
     helpfulPosts.forEach(function (el) {

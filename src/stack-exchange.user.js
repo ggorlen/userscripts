@@ -14,16 +14,19 @@
 // ==/UserScript==
 
 // TODO
-// - separate script to auto-cast delete votes on posts I've closed
+// - one-click links to add canonical comments, maybe from dropdown
+// - script to auto-cast delete votes on posts I've closed
 // - show OP's acceptance percentage and other stats on their question page
-// - make it work on review queues
 // - "show 1 comment" or "1 new answer" should be auto-clicked with a MutationObserver
-// - add (1) for votes other people have cast for a particular reason
-// - auto-click to accept reopen popups and other prompts
-// - shortcut to VTC with custom reason
-// - voting then retracting shouldn't re-show links after refreshing the page
+// - make it work on review queues
+// - add (1) for votes other people have cast for a particular reason (might be more trouble than its worth)
+// - auto-click to accept reopen popups and other prompts.
+// - don't show retract link if post is closed.
+// - make sure downvotes don't toggle on shift-clicks
+// - VTC with custom reason
+// - voting then retracting shouldn't re-show links if possible.
 // - when someone else edits the question, prevent VTC links from disappearing. maybe move close links container elsewhere (not so easy, it turns out)?
-// - vim keybindings using CodeMirror or Ace for stack snippets
+// - VIM keybindings using CodeMirror or Ace for stack snippets
 
 // REFS
 // - https://stackoverflow.com/questions/20462544/greasemonkey-tampermonkey-match-for-a-page-with-parameters
@@ -267,13 +270,26 @@ const tryCloseWelcomeBackBanner = () =>
   setTimeout(() => { // TODO MutationObserver
     const overlay = document.querySelector("#overlay-header");
     const msg = "Welcome back! If you found this question useful";
-  
+
     if (overlay && overlay.innerText.includes(msg) &&
       overlay.querySelector(".close-overlay")) {
       overlay.querySelector(".close-overlay").click();
     }
   }, 1000)
 ;
+
+const addClipboardTitleLink = () => {
+  const headerEl = document.querySelector("#question-header");
+  const title = headerEl.textContent.replace(/[closed]\s*$/, "").trim();
+  const clipboardEl = document.createElement("a");
+  headerEl.querySelector("h1").appendChild(clipboardEl);
+  clipboardEl.innerText = "📋";
+  clipboardEl.addEventListener("click", e => {
+    navigator.clipboard.writeText(
+      `[${title}](${window.location.href})`
+    );
+  });
+};
 
 (() => {
   removeAll(document.querySelectorAll(".user-gravatar32"));
@@ -287,7 +303,8 @@ const tryCloseWelcomeBackBanner = () =>
   if (shouldAddVoteContainer()) {
     addVoteContainer();
   }
-  
+
+  addClipboardTitleLink();
   addStyleSheet();
   tryCloseWelcomeBackBanner();
 })();
