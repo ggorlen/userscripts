@@ -280,7 +280,7 @@ const tryCloseWelcomeBackBanner = () =>
 
 const addClipboardTitleLink = () => {
   const headerEl = document.querySelector("#question-header");
-  const title = headerEl.textContent.replace(/\[closed\]\s*$/, "").trim();
+  const title = headerEl.textContent.replace(/\[(?:closed|duplicate)\]\s*$/, "").trim();
   const clipboardEl = document.createElement("a");
   headerEl.querySelector("h1").appendChild(clipboardEl);
   clipboardEl.innerText = "📋";
