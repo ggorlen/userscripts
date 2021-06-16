@@ -278,9 +278,18 @@ const tryCloseWelcomeBackBanner = () =>
   }, 1000)
 ;
 
-const addClipboardTitleLink = () => {
+const tryAddClipboardTitleLink = () => {
   const headerEl = document.querySelector("#question-header");
-  const title = headerEl.textContent.replace(/\[(?:closed|duplicate)\]\s*$/, "").trim();
+
+  if (!headerEl) {
+    return;
+  }
+
+  const title = headerEl.textContent.trim()
+    .replace(/\[(?:closed|duplicate)\]$/i, "")
+    .replace(/\[/g, "\\[")
+    .replace(/\]/g, "\\]")
+  ;
   const clipboardEl = document.createElement("a");
   headerEl.querySelector("h1").appendChild(clipboardEl);
   clipboardEl.innerText = "📋";
@@ -304,8 +313,15 @@ const addClipboardTitleLink = () => {
     addVoteContainer();
   }
 
-  addClipboardTitleLink();
+  tryAddClipboardTitleLink();
   addStyleSheet();
   tryCloseWelcomeBackBanner();
+
+  // TODO test this works
+  const banner = document.querySelector("[title='Dismiss']");
+
+  if (banner) {
+    banner.click();
+  }
 })();
 
