@@ -286,7 +286,7 @@ const tryAddClipboardTitleLink = () => {
   }
 
   const title = headerEl.textContent.trim()
-    .replace(/\[(?:closed|duplicate)\]$/i, "")
+    .replace(/ *\[(?:closed|duplicate)\]$/i, "")
     .replace(/\[/g, "\\[")
     .replace(/\]/g, "\\]")
   ;
