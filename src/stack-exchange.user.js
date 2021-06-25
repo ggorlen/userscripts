@@ -317,11 +317,14 @@ const tryAddClipboardTitleLink = () => {
   addStyleSheet();
   tryCloseWelcomeBackBanner();
 
-  // TODO test this works
-  const banner = document.querySelector("[title='Dismiss']");
+  // TODO needs more validation -- temporary
+  setTimeout(() => {
+    const banner = document.querySelector("[title='Dismiss']") ||
+      document.querySelector(".js-dismiss");
 
-  if (banner) {
-    banner.click();
-  }
+    if (banner) {
+      banner.click();
+    }
+  }, 2000);
 })();
 
