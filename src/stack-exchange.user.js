@@ -300,6 +300,23 @@ const tryAddClipboardTitleLink = () => {
   });
 };
 
+const highlightUsername = username => {
+  [...document.querySelectorAll(".comment-user")]
+    .forEach(e => {
+      if (e.textContent.trim() === username) {
+        e.style.background = "#990";
+      }
+    })
+  ;
+  [...document.querySelectorAll(".user-details")]
+    .forEach(e => {
+      if (e.textContent.includes(username)) {
+        e.style.background = "#990";
+      }
+    })
+  ;
+};
+
 (() => {
   removeAll(document.querySelectorAll(".user-gravatar32"));
   tryRm(document.querySelector(".s-sidebarwidget"));
@@ -316,6 +333,7 @@ const tryAddClipboardTitleLink = () => {
   tryAddClipboardTitleLink();
   addStyleSheet();
   tryCloseWelcomeBackBanner();
+  highlightUsername("ggorlen");
 
   // TODO needs more validation -- temporary
   setTimeout(() => {
