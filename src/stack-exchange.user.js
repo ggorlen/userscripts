@@ -14,6 +14,7 @@
 // ==/UserScript==
 
 // TODO
+// - https://meta.stackoverflow.com/questions/410618/how-can-we-find-last-seen-and-profile-views-info-on-the-profile-page-now-tha
 // - one-click links to add canonical comments, maybe from dropdown
 // - script to auto-cast delete votes on posts I've closed
 // - show OP's acceptance percentage and other stats on their question page
@@ -252,6 +253,9 @@ const addStyleSheet = () => {
 }
 .userscript-vote:hover {
   color: #3c4146;
+}
+.top-bar {
+  position: absolute;
 }
 `;
   const style = document.createElement("style");
