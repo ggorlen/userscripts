@@ -2,7 +2,9 @@
 
 ## Contents
 
-- [bandcamp-collection](src/bandcamp-collection.user.js): personalizes collection page
+- [bandcamp-album](src/bandcamp-album.user.js): removes noise from bandcamp album pages
+- [bandcamp-collection](src/bandcamp-collection.user.js): adds features to the bandcamp collection page
+- [bandcamp-feed](src/bandcamp-feed.user.js): removes noise from the bandcamp story feed
 - [glitch](src/glitch.user.js): shows a better project loading screen
 - [stack-exchange](src/stack-exchange.user.js): hides noisy features, adds one-click votes
 - [udacity](src/udacity.user.js): automatically clicks through 5-second wait between videos
