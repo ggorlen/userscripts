@@ -33,7 +33,7 @@
     }
   })();
 
-  document.addEventListener("load", () => {
+  document.addEventListener("DOMContentLoaded", () => {
     new MutationObserver(mutations => {
       for (const mut of mutations) {
         for (const node of mut.addedNodes) {
