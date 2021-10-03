@@ -13,6 +13,7 @@
 /* TODO
 - keep track of what's been listened to already on localhost and
     color differently, or add 'x' to dismiss a story and save on localhost
+     .. I guess the sidebar already does this, but the sequence is sort of unclear
 */
 (() => {
   const startTime = Date.now();
@@ -24,13 +25,15 @@
     });
     const fans = document.querySelector(".suggested-fans");
     fans && (fans.innerText = "");
+    const rel = document.querySelector(".more-releases");
+    rel?.offsetParent && rel.click();
 
     if (Date.now() - startTime < 5000) {
       requestAnimationFrame(check);
     }
   })();
 
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("load", () => {
     new MutationObserver(mutations => {
       for (const mut of mutations) {
         for (const node of mut.addedNodes) {
@@ -42,9 +45,6 @@
     }).observe(document.querySelector("#story-list"), {
       childList: true, subtree: true, attributes: true
     });
-    setTimeout(() =>
-      document.querySelector(".more-releases").click(), 2000 // FIXME
-    );
   });
 })();
 
