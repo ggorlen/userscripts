@@ -19,7 +19,7 @@
   const startTime = Date.now();
   (function check() {
     [...document.querySelectorAll("#story-list .story")].forEach(e => {
-      if (e.textContent.includes("bought")) {
+      if (e.textContent.includes("bought") || e.textContent.includes("pre-order")) {
         e.remove();
       }
     });
@@ -37,7 +37,7 @@
     new MutationObserver(mutations => {
       for (const mut of mutations) {
         for (const node of mut.addedNodes) {
-          if (node.textContent?.includes("bought")) {
+          if (node.textContent?.includes("bought") || node.textContent?.includes("pre-order")) {
             node.remove();
           }
         }
