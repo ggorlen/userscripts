@@ -329,6 +329,7 @@ const highlightUsername = username => {
   tryRm(document.querySelector(".ml12"));
   tryRm(document.querySelector(".bottom-notice"));
   tryRm(document.querySelector("footer"));
+  tryRm(document.querySelector(".s-sidebarwidget.js-join-leave-container.mb16"));
 
   if (shouldAddVoteContainer()) {
     addVoteContainer();
