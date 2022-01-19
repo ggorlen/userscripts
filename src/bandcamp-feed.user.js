@@ -19,7 +19,9 @@
   const startTime = Date.now();
   (function check() {
     [...document.querySelectorAll("#story-list .story")].forEach(e => {
-      if (e.textContent.includes("bought") || e.textContent.includes("pre-order")) {
+      const deny = ["started following you", "bought", "pre-order"];
+
+      if (deny.some(s => e.innerText.includes(s))) {
         e.remove();
       }
     });
@@ -37,7 +39,9 @@
     new MutationObserver(mutations => {
       for (const mut of mutations) {
         for (const node of mut.addedNodes) {
-          if (node.textContent?.includes("bought") || node.textContent?.includes("pre-order")) {
+          const deny = ["started following you", "bought", "pre-order"];
+
+          if (deny.some(s => node.innerText.includes(s))) {
             node.remove();
           }
         }
