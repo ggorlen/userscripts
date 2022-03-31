@@ -102,7 +102,6 @@ const postRetractVote = (onSuccess, onError) => {
 const shouldAddVoteContainer = () =>
   window.StackExchange.options.user.rep >= 3000 &&
   document.querySelector(".js-post-menu") &&
-  document.querySelector(".my-profile") &&
   !document.querySelector("#question.deleted-answer")
 ;
 
