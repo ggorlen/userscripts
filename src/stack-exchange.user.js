@@ -185,13 +185,8 @@ const addVoteLinks = container => {
     },
     {
       id: "SiteSpecific",
-      label: "gen.comp.",
-      siteSpecificId: 4
-    },
-    {
-      id: "SiteSpecific",
-      label: "serv/netw",
-      siteSpecificId: 7
+      label: "non-programming",
+      siteSpecificId: 18
     },
   ];
 
