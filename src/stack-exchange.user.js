@@ -343,5 +343,18 @@ const highlightUsername = username => {
       banner.click();
     }
   }, 2000);
-})();
 
+  new MutationObserver((mutationList, observer) => {
+    for (const mutation of mutationList) {
+      if (mutation.type === "childList") {
+
+        // when the flag modal opens, select the most common option
+        const sel = '#comment-flag-type-CommentNoLongerNeeded';
+        document.querySelector(sel)?.click();
+      }
+    }
+  }).observe(
+    document.body,
+    {attributes: true, childList: true, subtree: true}
+  );
+})();
