@@ -6,6 +6,7 @@
 // @author       ggorlen
 // @match        https://www.discogs.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=discogs.com
+// @run-at       document-start
 // @grant        none
 // ==/UserScript==
 
@@ -45,10 +46,48 @@ const addTotalDurationToPage = () => {
     if (!/^[0:]*$/.test(total)) {
       const footer = document.createElement("tfoot");
       footer.innerHTML = `<tr>
-        <td></td><td></td><td></td><td class="${cls}">Total:&nbsp;${total}</td>
+        <td></td><td></td><td></td><td class="${cls}"><small>(${total})</small></td>
       </tr>`;
       document.querySelector('[class^="tracklist"]').append(footer);
     }
   }
 };
-addTotalDurationToPage();
+
+const addStyleSheet = () => {
+  const css = `
+footer {
+  display: none !important;
+}
+a[href="/sell/cart"] {
+  display: none !important;
+}
+#master-actions {
+  display: none !important;
+}
+.wrapper_3ECKE {
+  display: none !important;
+}
+#master-release-marketplace {
+  display: none !important;
+}
+.categoriesItem_S45kC {
+  display: none !important;
+}
+`;
+  (document.head || document.documentElement).insertAdjacentHTML(
+    "beforeend",
+    `<style>${css}</style>`
+  );
+};
+addStyleSheet();
+
+document.addEventListener("DOMContentLoaded", () => {
+  addTotalDurationToPage();
+  new MutationObserver(function(mutations) {
+    addTotalDurationToPage();
+  }).observe(
+    document.querySelector("#release-tracklist"),
+    {childList: true, subtree: true}
+  );
+});
+
