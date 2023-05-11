@@ -54,29 +54,25 @@ const addTotalDurationToPage = () => {
 };
 
 const addStyleSheet = () => {
-  const css = `
-footer {
-  display: none !important;
-}
-a[href="/sell/cart"] {
-  display: none !important;
-}
+  const css = `<style>
+footer,
+.side_3-xID > .wrapper_cGBtH > .buttons_2jlYL,
+.side_3-xID .report_3dOkc,
+.wrapper_3ECKE,
+.ratings_1pAt8,
+#master-release-marketplace,
+#release-contributors,
+#release-marketplace,
+.categoriesItem_S45kC,
+a[href="/sell/cart"],
+a[href="/lists"],
+#release-actions,
 #master-actions {
   display: none !important;
 }
-.wrapper_3ECKE {
-  display: none !important;
-}
-#master-release-marketplace {
-  display: none !important;
-}
-.categoriesItem_S45kC {
-  display: none !important;
-}
-`;
+</style>`;
   (document.head || document.documentElement).insertAdjacentHTML(
-    "beforeend",
-    `<style>${css}</style>`
+    "beforeend", css
   );
 };
 addStyleSheet();
