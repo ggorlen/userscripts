@@ -33,7 +33,9 @@ const addTotalDurationToPage = () => {
     );
   };
 
-  const timeEls = [...document.querySelectorAll('#release-tracklist [class^="duration"]')];
+  const timeEls = [...document.querySelectorAll(
+    '#release-tracklist [data-track-position] [class^="duration"]'
+  )];
   const times = timeEls.map(e => e.textContent);
 
   if (times.length) {
