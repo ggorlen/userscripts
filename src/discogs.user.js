@@ -69,6 +69,7 @@ footer,
 a[href="/sell/cart"],
 a[href="/lists"],
 #release-actions,
+#audio,
 #master-actions {
   display: none !important;
 }
@@ -81,11 +82,11 @@ addStyleSheet();
 
 document.addEventListener("DOMContentLoaded", () => {
   addTotalDurationToPage();
-  new MutationObserver(function(mutations) {
+  new MutationObserver(function(mutations, observer) {
     addTotalDurationToPage();
+    observer.disconnect();
   }).observe(
     document.querySelector("#release-tracklist"),
     {childList: true, subtree: true}
   );
 });
-
