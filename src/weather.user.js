@@ -5,7 +5,8 @@
 // @description  remove noise
 // @author       ggorlen
 // @run-at       document-start
-// @match        https://weather.com/weather/tenday/*
+// @match        https://weather.com/weather/*
+// @match        https://weather.com/forecast/allergy*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=weather.com
 // @grant        none
 // ==/UserScript==
@@ -21,8 +22,7 @@
     document
       .querySelectorAll('script, [as="script"]')
       .forEach(e => e.remove());
-    const el = document
-      .querySelector(".DailyForecast--DisclosureList--nosQS");
+    const el = document.querySelector("section.card");
 
     if (el) {
       removeElementsExcept(el);
