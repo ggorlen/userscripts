@@ -35,9 +35,12 @@ const addTotalDurationToPage = () => {
 
   const timeEls = [...document.querySelectorAll(
     `#release-tracklist [data-track-position] [class^="duration"],
+     #release-tracklist [class^="index"] [class^="duration"],
      #release-tracklist [class^="subtrack"] [class^="duration"]`
   )];
-  const times = timeEls.map(e => e.textContent);
+  const times = timeEls
+    .map(e => e.textContent.replace(/[()]/g, ""))
+    .filter(Boolean);
 
   if (times.length) {
     const total = Object.values(toHMS(sumToSeconds(times)))
