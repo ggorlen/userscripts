@@ -188,6 +188,11 @@ const addVoteLinks = container => {
       label: "non-programming",
       siteSpecificId: 18
     },
+    {
+      id: "SiteSpecific",
+      label: "non-english",
+      siteSpecificId: 19
+    },
   ];
 
   const postCloseVoteThrottled = throttle(postCloseVote);
