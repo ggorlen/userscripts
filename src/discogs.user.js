@@ -50,11 +50,17 @@ const addTotalDurationToPage = () => {
     const cls = timeEls[0].className;
 
     if (!/^[0:]*$/.test(total)) {
-      const footer = document.createElement("tfoot");
-      footer.innerHTML = `<tr>
-        <td></td><td></td><td></td><td class="${cls}"><small>(${total})</small></td>
-      </tr>`;
-      document.querySelector('[class^="tracklist"]').append(footer);
+      setTimeout(() => {
+        const footer = document.createElement("tfoot");
+        footer.innerHTML = `<tr>
+          <td></td><td></td><td></td><td class="${cls}"><small>(${total})</small></td>
+        </tr>`;
+        const tracklist = document.querySelector('[class^="tracklist"]');
+
+        if (!tracklist.querySelector("small")) {
+          tracklist.append(footer);
+        }
+      }, 0);
     }
   }
 };
