@@ -14,6 +14,7 @@
 // ==/UserScript==
 
 // TODO
+// - BUG: sometimes flagging a comment freezes the page
 // - https://meta.stackoverflow.com/questions/410618/how-can-we-find-last-seen-and-profile-views-info-on-the-profile-page-now-tha
 // - one-click links to add canonical comments, maybe from dropdown
 // - script to auto-cast delete votes on posts I've closed
