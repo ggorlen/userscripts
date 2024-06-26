@@ -34,7 +34,7 @@
   })();
 
   function removeElementsExcept(currentElement) {
-    while (currentElement !== document.body) {
+    while (currentElement && currentElement !== document.body) {
       const parent = currentElement.parentNode;
 
       for (let i = parent.children.length - 1; i >= 0; i--) {

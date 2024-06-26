@@ -9,33 +9,8 @@
 // @grant        none
 // ==/UserScript==
 
-const debounce = (func, timeout=1000) => {
-  let timeoutId;
-  return (...args) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      func(...args);
-    }, timeout);
-  };
-};
-
-const purgeElementsExcept = (selector, ms = 3000) => {
-  const start = Date.now();
-  (function poll() {
-    const el = document.querySelector(selector);
-
-    if (el) {
-      removeElementsExcept(el);
-    }
-
-    if (Date.now() - start < ms) {
-      requestAnimationFrame(poll);
-    }
-  })();
-};
-
 const removeElementsExcept = currentElement => {
-  while (currentElement !== document.body) {
+  while (currentElement && currentElement !== document.body) {
     const parent = currentElement.parentNode;
 
     for (let i = parent.children.length - 1; i >= 0; i--) {
@@ -50,8 +25,10 @@ const removeElementsExcept = currentElement => {
   }
 };
 
-(function() {
-  const selector = "#tablature";
-  purgeElementsExcept(selector);
-  window.addEventListener("resize", debounce(() => purgeElementsExcept(selector)));
+(() => {
+  new MutationObserver(mutations => {
+    removeElementsExcept(document.querySelector("#tablature"));
+  }).observe(document.body, {
+    childList: true, subtree: true, attributes: true
+  });
 })();
