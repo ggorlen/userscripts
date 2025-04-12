@@ -20,7 +20,7 @@
 
   (function poll() {
     document
-      .querySelectorAll('script, [as="script"]')
+      .querySelectorAll('script, [as="script"], .DaypartDetails--DetailsTable--a4Nfo')
       .forEach(e => e.remove());
     const el = document.querySelector("section.card");
 
