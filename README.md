@@ -7,6 +7,7 @@
 - [bandcamp-feed](src/bandcamp-feed.user.js): removes noise from the bandcamp story feed
 - [codementor](src/codementor.user.js): auto-refreshes the feed
 - [discogs](src/discogs.user.js): shows total album durations
+- [github](src/github.user.js): removes noise
 - [glitch](src/glitch.user.js): shows a better project loading screen
 - [pitchfork](src/pitchfork.user.js): removes annoying autoplay videos
 - [songsterr](src/songsterr.user.js): removes noise from tab pages
