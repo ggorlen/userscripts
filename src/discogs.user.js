@@ -16,7 +16,7 @@ const addTotalDurationToPage = () => {
       const parts = e.trim().split(":").map(Number);
       parts.forEach((e, i) => {
         if (i < parts.length - 1) {
-          parts[i+1] += e * 60;
+          parts[i + 1] += e * 60;
         }
       });
       return parts.pop() + a;
@@ -33,36 +33,52 @@ const addTotalDurationToPage = () => {
     );
   };
 
-  const timeEls = [...document.querySelectorAll(
-    `#release-tracklist [data-track-position] [class^="duration"],
+  const timeEls = [
+    ...document.querySelectorAll(
+      `#release-tracklist [data-track-position] [class^="duration"],
      #release-tracklist [class^="index"] [class^="duration"],
      #release-tracklist [class^="subtrack"] [class^="duration"]`
-  )];
+    ),
+  ];
   const times = timeEls
     .map(e => e.textContent.replace(/[()]/g, ""))
     .filter(Boolean);
 
-  if (times.length) {
-    const total = Object.values(toHMS(sumToSeconds(times)))
-      .map(e => String(e).padStart(2, 0))
-      .join(":")
-      .replace(/^[0:]*/, "");
-    const cls = timeEls[0].className;
-
-    if (!/^[0:]*$/.test(total)) {
-      setTimeout(() => {
-        const footer = document.createElement("tfoot");
-        footer.innerHTML = `<tr>
-          <td></td><td></td><td></td><td class="${cls}"><small>(${total})</small></td>
-        </tr>`;
-        const tracklist = document.querySelector('[class^="tracklist"]');
-
-        if (!tracklist.querySelector("small")) {
-          tracklist.append(footer);
-        }
-      }, 0);
-    }
+  if (times.length === 0) {
+    return;
   }
+
+  const total = Object.values(toHMS(sumToSeconds(times)))
+    .map(e => String(e).padStart(2, 0))
+    .join(":")
+    .replace(/^[0:]*/, "");
+  const cls = timeEls[0].className;
+
+  if (/^[0:]*$/.test(total)) {
+    return;
+  }
+
+  setTimeout(() => {
+    const header = document.querySelector(
+      "header[class^='header'] h2"
+    );
+
+    if (header.textContent === "Tracklist") {
+      header.textContent += ` (${times.length})`;
+    }
+
+    const footer = document.createElement("tfoot");
+    footer.innerHTML = `<tr>
+      <td></td><td></td><td></td><td class="${cls}"><small>(${total})</small></td>
+    </tr>`;
+    const tracklist = document.querySelector(
+      '[class^="tracklist"]'
+    );
+
+    if (!tracklist.querySelector("small")) {
+      tracklist.append(footer);
+    }
+  }, 0);
 };
 
 const addStyleSheet = () => {
@@ -85,18 +101,19 @@ a[href="/lists"],
 }
 </style>`;
   (document.head || document.documentElement).insertAdjacentHTML(
-    "beforeend", css
+    "beforeend",
+    css
   );
 };
 addStyleSheet();
 
 document.addEventListener("DOMContentLoaded", () => {
   addTotalDurationToPage();
-  new MutationObserver(function(mutations, observer) {
+  new MutationObserver(function (mutations, observer) {
     addTotalDurationToPage();
     observer.disconnect();
-  }).observe(
-    document.querySelector("#release-tracklist"),
-    {childList: true, subtree: true}
-  );
+  }).observe(document.querySelector("#release-tracklist"), {
+    childList: true,
+    subtree: true,
+  });
 });
