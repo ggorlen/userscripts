@@ -9,16 +9,20 @@
 // @run-at       document-start
 // @grant        none
 // ==/UserScript==
-
-
 // discogs userscript: one click "add to listened list" button
 
+const pasteFlag = "::PASTEFLAG::";
 function handlePaste(e) {
-  e.stopPropagation();
-  e.preventDefault();
   const clipboardData = e.clipboardData || window.clipboardData;
   const pastedData = clipboardData.getData('Text');
-  addVideosFromYouTube(pastedData.trim().split("\n"));
+
+  if (!pastedData.startsWith(pasteFlag)) {
+    return;
+  }
+
+  e.stopPropagation();
+  e.preventDefault();
+  addVideosFromYouTube(pastedData.slice(pasteFlag.length).trim().split("\n"));
 }
 
 const addVideosFromYouTube = async (titles) => {
@@ -167,7 +171,7 @@ const addTotalDurationToPage = () => {
           ...document.querySelectorAll('[class^="tracklist"] td[class*="trackTitle"]'),
         ].slice(0, timeEls.length);
         const text = [...tracklist].map(e => e.textContent).join("\n");
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(pasteFlag + text);
       });
     }
 
