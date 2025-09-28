@@ -9,7 +9,15 @@
 // @run-at       document-start
 // @grant        none
 // ==/UserScript==
-// discogs userscript: one click "add to listened list" button
+// discogs userscript: one click "add to listened list" button, autoplay
+
+// bugs:
+// - userscript should ignore parenthesis when counting tracks:
+//   - https://www.discogs.com/master/420260-Bach-Gubaidulina-Anne-Sophie-Mutter-Violin-Concertos-In-Tempus-Praesens
+//   - https://www.discogs.com/master/261660-Spocks-Beard-V
+// - https://www.discogs.com/release/1081405-Lou-Reed-Street-Hassle
+// - https://www.discogs.com/release/35023970-Fleshwater-2000-In-Search-Of-The-Endless-Sky
+// - https://www.discogs.com/release/13858581-Mitchell-W-Feldstein-Pretty-Boss
 
 const pasteFlag = "::PASTEFLAG::";
 function handlePaste(e) {
@@ -186,7 +194,7 @@ const addTotalDurationToPage = () => {
         tracklist.append(footer);
       }
     }
-  }, 0);
+  }, 500);
 };
 
 const addStyleSheet = () => {
