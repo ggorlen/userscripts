@@ -222,9 +222,70 @@ a[href="/lists"],
 };
 addStyleSheet();
 
+const addToListened = async () => {
+  try {
+    const match = location.pathname.match(/\/(?:release|master)\/(\d+)/);
+    if (!match) {
+      alert("Could not find release or master ID in URL");
+      return;
+    }
+
+    const releaseId = parseInt(match[1], 10);
+    const response = await fetch("https://www.discogs.com/service/catalog/api/graphql", {
+      credentials: "include",
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "apollographql-client-name": "release-page-client"
+      },
+      body: JSON.stringify({
+        operationName: "AddItemToExistingList",
+        variables: {
+          input: {
+            itemDiscogsId: releaseId,
+            listDiscogsId: 633552, // "listened" list
+            itemType: location.pathname.includes("/release/") ? "RELEASE": "MASTER_RELEASE",
+            comment: ""
+          }
+        },
+        extensions: {
+          persistedQuery: {
+            version: 1,
+            sha256Hash: "394903702c8c40d06d0caf83c58a5f876097205cf85be97eeb2b39646455aaa2"
+          }
+        }
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok && !data.errors) {
+      console.log(`✅ Added release ${releaseId} to 'listened' list`);
+    } else {
+      console.error("Discogs API error:", data);
+      alert("Failed to add — check console for details");
+    }
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    alert("Something went wrong — see console");
+  }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   document.body.addEventListener('paste', handlePaste);
   addTotalDurationToPage();
+  setTimeout(() => {
+    const addToListButton = [...document.querySelectorAll("button")]
+      .find(e => e.textContent === "Add to List");
+    const addToListenedButton = document.createElement("button");
+    addToListenedButton.textContent = "Mark Listened";
+    addToListenedButton.addEventListener("click", async () => {
+      await addToListened();
+      addToListenedButton.textContent = "Mark Listened ✅";
+      addToListenedButton.disabled = true;
+    });
+    addToListButton.parentNode.append(addToListenedButton);
+  }, 1000);
   new MutationObserver(function(mutations, observer) {
     addTotalDurationToPage();
     observer.disconnect();
