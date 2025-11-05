@@ -177,7 +177,7 @@ const addTotalDurationToPage = () => {
         const tracklist = [
           ...document.querySelectorAll('[class^="tracklist"] span[class*="trackTitle"]'),
           ...document.querySelectorAll('[class^="tracklist"] td[class*="trackTitle"]'),
-        ].slice(0, timeEls.length);
+        ].slice(0, timeEls.length || document.querySelectorAll("[data-track-position]").length);
         const text = [...tracklist].map(e => e.textContent).join("\n");
         await navigator.clipboard.writeText(pasteFlag + text);
       });
