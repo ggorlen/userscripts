@@ -279,7 +279,7 @@ const tryCloseWelcomeBackBanner = () =>
       overlay.querySelector(".close-overlay")) {
       overlay.querySelector(".close-overlay").click();
     }
-  }, 1000)
+  }, 4000)
 ;
 
 const tryAddClipboardTitleLink = () => {
