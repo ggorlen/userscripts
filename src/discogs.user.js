@@ -9,7 +9,7 @@
 // @run-at       document-start
 // @grant        none
 // ==/UserScript==
-// discogs userscript: one click "add to listened list" button, autoplay
+// discogs userscript todo: autoplay
 
 // bugs:
 // - userscript should ignore parenthesis when counting tracks:
@@ -265,6 +265,8 @@ const addToListened = async () => {
       console.error("Discogs API error:", data);
       alert("Failed to add — check console for details");
     }
+
+    return data;
   } catch (err) {
     console.error("Unexpected error:", err);
     alert("Something went wrong — see console");
@@ -280,9 +282,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const addToListenedButton = document.createElement("button");
     addToListenedButton.textContent = "Mark Listened";
     addToListenedButton.addEventListener("click", async () => {
-      await addToListened();
-      addToListenedButton.textContent = "Mark Listened ✅";
-      addToListenedButton.disabled = true;
+      if (await addToListened()) {
+        addToListenedButton.textContent = "Mark Listened ✅";
+        addToListenedButton.disabled = true;
+      }
     });
     addToListButton.parentNode.append(addToListenedButton);
   }, 1000);
