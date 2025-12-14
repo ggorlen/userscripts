@@ -10,6 +10,8 @@
 // @grant        none
 // ==/UserScript==
 
+// TODO: sum the track durations to show the total time
+
 (() => {
   let queries = [
     ".collected-by",
