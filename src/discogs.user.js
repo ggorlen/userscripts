@@ -125,7 +125,7 @@ const addVideosFromYouTube = async (titles) => {
     }
 
     if (bestMatch) {
-      findButtonByText("Add")?.click();
+      document.querySelector(".results_fzr77 .button_PgYDF").click();
     }
   }
 };
