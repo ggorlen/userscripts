@@ -10,7 +10,7 @@
 - [github](src/github.user.js): removes noise and provides a button to auto-merge PRs
 - ~~[glitch](src/glitch.user.js): shows a better project loading screen~~
 - [pitchfork](src/pitchfork.user.js): removes annoying autoplay videos
-- [songster](src/songster.user.js): removes noise from tab pages
+- [songsterr](src/songsterr.user.js): removes noise from tab pages
 - [stack-exchange](src/stack-exchange.user.js): hides noisy features, adds one-click votes
 - ~~[udacity](src/udacity.user.js): automatically clicks through 5-second wait between videos~~
 - [weather](src/weather.user.js): removes ads and noise
