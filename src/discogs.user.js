@@ -15,6 +15,7 @@
 // - userscript should ignore parenthesis when counting tracks:
 //   - https://www.discogs.com/master/420260-Bach-Gubaidulina-Anne-Sophie-Mutter-Violin-Concertos-In-Tempus-Praesens
 //   - https://www.discogs.com/master/261660-Spocks-Beard-V
+//   - https://www.discogs.com/master/10291-Ulver-Perdition-City-Music-To-An-Interior-Film
 //   - https://www.discogs.com/master/3755-Nine-Inch-Nails-Further-Down-The-Spiral
 // - https://www.discogs.com/release/1081405-Lou-Reed-Street-Hassle
 // - https://www.discogs.com/release/35023970-Fleshwater-2000-In-Search-Of-The-Endless-Sky
@@ -173,7 +174,8 @@ const addTotalDurationToPage = () => {
     const header = document.querySelector("header[class^='header'] h2");
 
     if (header.textContent === "Tracklist") {
-      header.innerHTML += (times.length ? ` (${times.length})` : "") + ` <button id="copy-tracks">Copy</button>`;
+      const trackCount = times.length || document.querySelectorAll("[data-track-position]").length;
+      header.innerHTML += ` (${trackCount}) <button id="copy-tracks">Copy</button>`;
       header.querySelector("#copy-tracks").addEventListener("click", async event => {
         const tracklist = [
           ...document.querySelectorAll('[class^="tracklist"] span[class*="trackTitle"]'),
