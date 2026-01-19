@@ -94,7 +94,7 @@ const addVideosFromYouTube = async (titles) => {
   const albumTitle = document.querySelector("[class*=title]").textContent;
   for (const title of titles) {
     const input = findInputByLabelText("YouTube search query:");
-    setNativeValue(input, `${albumTitle} ${title} "provided"`);
+    setNativeValue(input, `${albumTitle.replace(/\(\d+\)/, "")} ${title} "provided"`);
     input.dispatchEvent(new Event("input", { bubbles: true }));
     findButtonByText("Search")?.click();
     await delay(2000); // TODO actually wait like below:
