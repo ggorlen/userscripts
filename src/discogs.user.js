@@ -9,9 +9,8 @@
 // @run-at       document-start
 // @grant        none
 // ==/UserScript==
-// discogs userscript todo: autoplay
 
-// bugs:
+// Bugs:
 // - userscript should ignore parenthesis when counting tracks:
 //   - https://www.discogs.com/master/420260-Bach-Gubaidulina-Anne-Sophie-Mutter-Violin-Concertos-In-Tempus-Praesens
 //   - https://www.discogs.com/master/261660-Spocks-Beard-V
@@ -20,11 +19,17 @@
 // - https://www.discogs.com/release/1081405-Lou-Reed-Street-Hassle
 // - https://www.discogs.com/release/35023970-Fleshwater-2000-In-Search-Of-The-Endless-Sky
 // - https://www.discogs.com/release/13858581-Mitchell-W-Feldstein-Pretty-Boss
+//
+// TODO:
+// - 1-click list removal
+// - speed up adding tracklist count
+// - add support for trying to find a full album first, then fallback on provided
+// - autoplay, requires changing browser flag
 
 const pasteFlag = "::PASTEFLAG::";
-function handlePaste(e) {
+const handlePaste = e => {
   const clipboardData = e.clipboardData || window.clipboardData;
-  const pastedData = clipboardData.getData('Text');
+  const pastedData = clipboardData.getData("Text");
 
   if (!pastedData.startsWith(pasteFlag)) {
     return;
@@ -35,8 +40,11 @@ function handlePaste(e) {
   addVideosFromYouTube(pastedData.slice(pasteFlag.length).trim().split("\n"));
 }
 
+const findButtonByText = text =>
+  [...document.querySelectorAll("button")].find(btn => btn.textContent.trim() === text);
+
 const addVideosFromYouTube = async (titles) => {
-  function setNativeValue(element, value) {
+  const setNativeValue = (element, value) => {
     const valueSetter = Object.getOwnPropertyDescriptor(element, "value")?.set;
     const prototype = Object.getPrototypeOf(element);
     const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, "value")?.set;
@@ -46,9 +54,9 @@ const addVideosFromYouTube = async (titles) => {
     } else {
       valueSetter.call(element, value);
     }
-  }
+  };
 
-  function findInputByLabelText(labelText) {
+  const findInputByLabelText = labelText => {
     return [...document.querySelectorAll('label')].reduce((found, label) => {
       if (found) return found;
       if (label.textContent.trim() === labelText.trim()) {
@@ -58,17 +66,9 @@ const addVideosFromYouTube = async (titles) => {
       }
       return null;
     }, null);
-  }
+  };
 
-  function findButtonByText(text) {
-    return [...document.querySelectorAll("button")].find(btn => btn.textContent.trim() === text);
-  }
-
-  function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  function levenshtein(a, b) {
+  const levenshtein = (a, b) => {
     const matrix = Array.from({ length: b.length + 1 }, (_, i) =>
       Array(a.length + 1).fill(0)
     );
@@ -91,27 +91,40 @@ const addVideosFromYouTube = async (titles) => {
     return matrix[b.length][a.length];
   }
 
+  const getVideos = () => [...document.querySelectorAll("[class*='results'] li")];
+
   const albumTitle = document.querySelector("[class*=title]").textContent;
+
   for (const title of titles) {
     const input = findInputByLabelText("YouTube search query:");
     setNativeValue(input, `${albumTitle.replace(/\(\d+\)/, "")} ${title} "provided"`);
     input.dispatchEvent(new Event("input", { bubbles: true }));
-    findButtonByText("Search")?.click();
-    await delay(2000); // TODO actually wait like below:
+    const videosBeforeSearching = getVideos().map(e => e.textContent);
+    findButtonByText("Search").click();
 
-    //const videos = await new Promise(resolve => {
-    //  (function update() {
-    //    const videos =
-    //      [...document.querySelectorAll("[class*='results'] li")];
-    //
-    //    if (videos.length) {
-    //      return resolve(videos);
-    //    }
-    //
-    //    requestAnimationFrame(update);
-    //  })();
-    //});
-    const videos = [...document.querySelectorAll("[class*='results'] li")];
+    await new Promise(resolve => {
+      let iterations = 100;
+      (function poll() {
+        const videos = getVideos().map(e => e.textContent);
+
+        if (videos.length !== videosBeforeSearching.length) {
+          return resolve();
+        }
+
+        for (const [i, e] of videos.entries()) {
+          if (e !== videosBeforeSearching[i]) {
+            return resolve();
+          }
+        }
+
+        if (--iterations < 0) {
+          return resolve();
+        }
+
+        return requestAnimationFrame(poll);
+      })();
+    });
+    const videos = getVideos();
     let bestMatch = null;
     let minDistance = Infinity;
 
@@ -173,7 +186,7 @@ const addTotalDurationToPage = () => {
   setTimeout(() => {
     const header = document.querySelector("header[class^='header'] h2");
 
-    if (header.textContent === "Tracklist") {
+    if (header?.textContent === "Tracklist") {
       const trackCount = times.length || document.querySelectorAll("[data-track-position]").length;
       header.innerHTML += ` (${trackCount}) <button id="copy-tracks">Copy</button>`;
       header.querySelector("#copy-tracks").addEventListener("click", async event => {
@@ -223,7 +236,6 @@ a[href="/lists"],
     "beforeend", css
   );
 };
-addStyleSheet();
 
 const addToListened = async () => {
   try {
@@ -246,7 +258,7 @@ const addToListened = async () => {
         variables: {
           input: {
             itemDiscogsId: releaseId,
-            listDiscogsId: 633552, // "listened" list
+            listDiscogsId: 633552, // my "listened" list
             itemType: location.pathname.includes("/release/") ? "RELEASE": "MASTER_RELEASE",
             comment: ""
           }
@@ -263,7 +275,7 @@ const addToListened = async () => {
     const data = await response.json();
 
     if (response.ok && !data.errors) {
-      console.log(`✅ Added release ${releaseId} to 'listened' list`);
+      console.log(`Added release ${releaseId} to 'listened' list`);
     } else {
       console.error("Discogs API error:", data);
       alert("Failed to add — check console for details");
@@ -276,27 +288,31 @@ const addToListened = async () => {
   }
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.body.addEventListener('paste', handlePaste);
-  addTotalDurationToPage();
-  setTimeout(() => {
-    const addToListButton = [...document.querySelectorAll("button")]
-      .find(e => e.textContent === "Add to List");
+const addAddToListButton = () => {
+  let iterations = 100;
+  (function poll() {
+    const addToListButton = findButtonByText("Add to List");
     const addToListenedButton = document.createElement("button");
     addToListenedButton.textContent = "Mark Listened";
+    addToListenedButton.style.marginLeft = "0.5em";
     addToListenedButton.addEventListener("click", async () => {
       if (await addToListened()) {
         addToListenedButton.textContent = "Mark Listened ✅";
         addToListenedButton.disabled = true;
       }
     });
-    addToListButton.parentNode.append(addToListenedButton);
-  }, 1000);
-  new MutationObserver(function(mutations, observer) {
-    addTotalDurationToPage();
-    observer.disconnect();
-  }).observe(
-    document.querySelector("#release-tracklist"),
-    {childList: true, subtree: true}
-  );
+    addToListButton?.parentNode.append(addToListenedButton);
+
+    if (!addToListButton && --iterations >= 0) {
+      requestAnimationFrame(poll);
+    }
+  })();
+};
+
+addStyleSheet();
+document.addEventListener("DOMContentLoaded", () => {
+  document.body.addEventListener("paste", handlePaste);
+  addTotalDurationToPage();
+  addAddToListButton();
 });
+
