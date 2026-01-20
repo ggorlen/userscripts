@@ -37,17 +37,27 @@ const handlePaste = e => {
 
   e.stopPropagation();
   e.preventDefault();
-  addVideosFromYouTube(pastedData.slice(pasteFlag.length).trim().split("\n"));
-}
+  addVideosFromYouTube(
+    pastedData.slice(pasteFlag.length).trim().split("\n")
+  );
+};
 
 const findButtonByText = text =>
-  [...document.querySelectorAll("button")].find(btn => btn.textContent.trim() === text);
+  [...document.querySelectorAll("button")].find(
+    btn => btn.textContent.trim() === text
+  );
 
-const addVideosFromYouTube = async (titles) => {
+const addVideosFromYouTube = async titles => {
   const setNativeValue = (element, value) => {
-    const valueSetter = Object.getOwnPropertyDescriptor(element, "value")?.set;
+    const valueSetter = Object.getOwnPropertyDescriptor(
+      element,
+      "value"
+    )?.set;
     const prototype = Object.getPrototypeOf(element);
-    const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, "value")?.set;
+    const prototypeValueSetter = Object.getOwnPropertyDescriptor(
+      prototype,
+      "value"
+    )?.set;
 
     if (valueSetter && valueSetter !== prototypeValueSetter) {
       prototypeValueSetter.call(element, value);
@@ -57,19 +67,22 @@ const addVideosFromYouTube = async (titles) => {
   };
 
   const findInputByLabelText = labelText => {
-    return [...document.querySelectorAll('label')].reduce((found, label) => {
-      if (found) return found;
-      if (label.textContent.trim() === labelText.trim()) {
-        return label.htmlFor
-          ? document.getElementById(label.htmlFor)
-          : label.querySelector('input, textarea, select');
-      }
-      return null;
-    }, null);
+    return [...document.querySelectorAll("label")].reduce(
+      (found, label) => {
+        if (found) return found;
+        if (label.textContent.trim() === labelText.trim()) {
+          return label.htmlFor
+            ? document.getElementById(label.htmlFor)
+            : label.querySelector("input, textarea, select");
+        }
+        return null;
+      },
+      null
+    );
   };
 
   const levenshtein = (a, b) => {
-    const matrix = Array.from({ length: b.length + 1 }, (_, i) =>
+    const matrix = Array.from({length: b.length + 1}, (_, i) =>
       Array(a.length + 1).fill(0)
     );
 
@@ -78,28 +91,37 @@ const addVideosFromYouTube = async (titles) => {
 
     for (let i = 1; i <= b.length; i++) {
       for (let j = 1; j <= a.length; j++) {
-        matrix[i][j] = b[i - 1] === a[j - 1]
-          ? matrix[i - 1][j - 1]
-          : Math.min(
-              matrix[i - 1][j] + 1,
-              matrix[i][j - 1] + 1,
-              matrix[i - 1][j - 1] + 1
-            );
+        matrix[i][j] =
+          b[i - 1] === a[j - 1]
+            ? matrix[i - 1][j - 1]
+            : Math.min(
+                matrix[i - 1][j] + 1,
+                matrix[i][j - 1] + 1,
+                matrix[i - 1][j - 1] + 1
+              );
       }
     }
 
     return matrix[b.length][a.length];
-  }
+  };
 
-  const getVideos = () => [...document.querySelectorAll("[class*='results'] li")];
+  const getVideos = () => [
+    ...document.querySelectorAll("[class*='results'] li"),
+  ];
 
-  const albumTitle = document.querySelector("[class*=title]").textContent;
+  const albumTitle =
+    document.querySelector("[class*=title]").textContent;
 
   for (const title of titles) {
     const input = findInputByLabelText("YouTube search query:");
-    setNativeValue(input, `${albumTitle.replace(/\(\d+\)/, "")} ${title} "provided"`);
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-    const videosBeforeSearching = getVideos().map(e => e.textContent);
+    setNativeValue(
+      input,
+      `${albumTitle.replace(/\(\d+\)/, "")} ${title} "provided"`
+    );
+    input.dispatchEvent(new Event("input", {bubbles: true}));
+    const videosBeforeSearching = getVideos().map(
+      e => e.textContent
+    );
     findButtonByText("Search").click();
 
     await new Promise(resolve => {
@@ -131,7 +153,10 @@ const addVideosFromYouTube = async (titles) => {
     for (const video of videos) {
       const link = video.querySelector("a");
       const resultTitle = link.textContent.trim();
-      const dist = levenshtein(title.toLowerCase(), resultTitle.toLowerCase());
+      const dist = levenshtein(
+        title.toLowerCase(),
+        resultTitle.toLowerCase()
+      );
 
       if (dist < minDistance) {
         minDistance = dist;
@@ -140,7 +165,9 @@ const addVideosFromYouTube = async (titles) => {
     }
 
     if (bestMatch) {
-      document.querySelector(".results_fzr77 .button_PgYDF").click();
+      document
+        .querySelector(".results_fzr77 .button_PgYDF")
+        .click();
     }
   }
 };
@@ -151,7 +178,7 @@ const addTotalDurationToPage = () => {
       const parts = e.trim().split(":").map(Number);
       parts.forEach((e, i) => {
         if (i < parts.length - 1) {
-          parts[i+1] += e * 60;
+          parts[i + 1] += e * 60;
         }
       });
       return parts.pop() + a;
@@ -168,11 +195,13 @@ const addTotalDurationToPage = () => {
     );
   };
 
-  const timeEls = [...document.querySelectorAll(
-    `#release-tracklist [data-track-position] [class^="duration"],
+  const timeEls = [
+    ...document.querySelectorAll(
+      `#release-tracklist [data-track-position] [class^="duration"],
      #release-tracklist [class^="index"] [class^="duration"],
      #release-tracklist [class^="subtrack"] [class^="duration"]`
-  )];
+    ),
+  ];
   const times = timeEls
     .map(e => e.textContent.replace(/[()]/g, ""))
     .filter(Boolean);
@@ -184,19 +213,37 @@ const addTotalDurationToPage = () => {
   const cls = timeEls[0]?.className;
 
   setTimeout(() => {
-    const header = document.querySelector("header[class^='header'] h2");
+    const header = document.querySelector(
+      "header[class^='header'] h2"
+    );
 
     if (header?.textContent === "Tracklist") {
-      const trackCount = times.length || document.querySelectorAll("[data-track-position]").length;
+      const trackCount =
+        times.length ||
+        document.querySelectorAll("[data-track-position]")
+          .length;
       header.innerHTML += ` (${trackCount}) <button id="copy-tracks">Copy</button>`;
-      header.querySelector("#copy-tracks").addEventListener("click", async event => {
-        const tracklist = [
-          ...document.querySelectorAll('[class^="tracklist"] span[class*="trackTitle"]'),
-          ...document.querySelectorAll('[class^="tracklist"] td[class*="trackTitle"]'),
-        ].slice(0, timeEls.length || document.querySelectorAll("[data-track-position]").length);
-        const text = [...tracklist].map(e => e.textContent).join("\n");
-        await navigator.clipboard.writeText(pasteFlag + text);
-      });
+      header
+        .querySelector("#copy-tracks")
+        .addEventListener("click", async event => {
+          const tracklist = [
+            ...document.querySelectorAll(
+              '[class^="tracklist"] span[class*="trackTitle"]'
+            ),
+            ...document.querySelectorAll(
+              '[class^="tracklist"] td[class*="trackTitle"]'
+            ),
+          ].slice(
+            0,
+            timeEls.length ||
+              document.querySelectorAll("[data-track-position]")
+                .length
+          );
+          const text = [...tracklist]
+            .map(e => e.textContent)
+            .join("\n");
+          await navigator.clipboard.writeText(pasteFlag + text);
+        });
     }
 
     if (times.length) {
@@ -204,7 +251,9 @@ const addTotalDurationToPage = () => {
       footer.innerHTML = `<tr>
         <td></td><td></td><td></td><td class="${cls}"><small>(${total})</small></td>
       </tr>`;
-      const tracklist = document.querySelector('[class^="tracklist"]');
+      const tracklist = document.querySelector(
+        '[class^="tracklist"]'
+      );
 
       if (!tracklist.querySelector("small")) {
         tracklist.append(footer);
@@ -233,49 +282,60 @@ a[href="/lists"],
 }
 </style>`;
   (document.head || document.documentElement).insertAdjacentHTML(
-    "beforeend", css
+    "beforeend",
+    css
   );
 };
 
 const addToListened = async () => {
   try {
-    const match = location.pathname.match(/\/(?:release|master)\/(\d+)/);
+    const match = location.pathname.match(
+      /\/(?:release|master)\/(\d+)/
+    );
     if (!match) {
       alert("Could not find release or master ID in URL");
       return;
     }
 
     const releaseId = parseInt(match[1], 10);
-    const response = await fetch("https://www.discogs.com/service/catalog/api/graphql", {
-      credentials: "include",
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "apollographql-client-name": "release-page-client"
-      },
-      body: JSON.stringify({
-        operationName: "AddItemToExistingList",
-        variables: {
-          input: {
-            itemDiscogsId: releaseId,
-            listDiscogsId: 633552, // my "listened" list
-            itemType: location.pathname.includes("/release/") ? "RELEASE": "MASTER_RELEASE",
-            comment: ""
-          }
+    const response = await fetch(
+      "https://www.discogs.com/service/catalog/api/graphql",
+      {
+        credentials: "include",
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "apollographql-client-name": "release-page-client",
         },
-        extensions: {
-          persistedQuery: {
-            version: 1,
-            sha256Hash: "394903702c8c40d06d0caf83c58a5f876097205cf85be97eeb2b39646455aaa2"
-          }
-        }
-      })
-    });
+        body: JSON.stringify({
+          operationName: "AddItemToExistingList",
+          variables: {
+            input: {
+              itemDiscogsId: releaseId,
+              listDiscogsId: 633552, // my "listened" list
+              itemType: location.pathname.includes("/release/")
+                ? "RELEASE"
+                : "MASTER_RELEASE",
+              comment: "",
+            },
+          },
+          extensions: {
+            persistedQuery: {
+              version: 1,
+              sha256Hash:
+                "394903702c8c40d06d0caf83c58a5f876097205cf85be97eeb2b39646455aaa2",
+            },
+          },
+        }),
+      }
+    );
 
     const data = await response.json();
 
     if (response.ok && !data.errors) {
-      console.log(`Added release ${releaseId} to 'listened' list`);
+      console.log(
+        `Added release ${releaseId} to 'listened' list`
+      );
     } else {
       console.error("Discogs API error:", data);
       alert("Failed to add — check console for details");
