@@ -22,6 +22,7 @@
 //
 // TODO:
 // - 1-click list removal
+// - auto-remove dead videos
 // - speed up adding tracklist count
 // - add support for trying to find a full album first, then fallback on provided
 // - autoplay, requires changing browser flag
@@ -277,6 +278,7 @@ a[href="/sell/cart"],
 a[href="/lists"],
 #release-actions,
 #audio,
+#shopping-box-host,
 #master-actions {
   display: none !important;
 }
@@ -372,7 +374,7 @@ const addAddToListButton = () => {
 addStyleSheet();
 document.addEventListener("DOMContentLoaded", () => {
   document.body.addEventListener("paste", handlePaste);
-  addTotalDurationToPage();
   addAddToListButton();
+  setTimeout(addTotalDurationToPage, 500);
 });
 
