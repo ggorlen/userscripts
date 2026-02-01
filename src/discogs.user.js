@@ -124,10 +124,10 @@ const addVideosFromYouTube = async titles => {
       e => e.textContent
     );
     findButtonByText("Search").click();
-
+    await new Promise(r => setTimeout(r, 500));
     await new Promise(resolve => {
       let iterations = 100;
-      (function poll() {
+      const intervalId = setInterval(() => {
         const videos = getVideos().map(e => e.textContent);
 
         if (videos.length !== videosBeforeSearching.length) {
@@ -136,16 +136,16 @@ const addVideosFromYouTube = async titles => {
 
         for (const [i, e] of videos.entries()) {
           if (e !== videosBeforeSearching[i]) {
+            clearInterval(intervalId);
             return resolve();
           }
         }
 
         if (--iterations < 0) {
+          clearInterval(intervalId);
           return resolve();
         }
-
-        return requestAnimationFrame(poll);
-      })();
+      }, 20);
     });
     const videos = getVideos();
     let bestMatch = null;
@@ -377,4 +377,3 @@ document.addEventListener("DOMContentLoaded", () => {
   addAddToListButton();
   setTimeout(addTotalDurationToPage, 500);
 });
-
