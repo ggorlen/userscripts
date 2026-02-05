@@ -39,8 +39,6 @@ var tid = setInterval(() => {
 
 setTimeout(() => {
   document.querySelector("#_r_6v_").click();
-  
-  
   setTimeout(() => {
     [...document.querySelectorAll("span")]
       .find(e => e.textContent.includes("from this branch will be combined into one commit in the base branch"))
