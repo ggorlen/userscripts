@@ -38,21 +38,11 @@ var tid = setInterval(() => {
 */
 
 const intervalId = setInterval(() => {
-  const arrow = document.querySelector('[data-testid="mergebox-partial"] .octicon.octicon-triangle-down');
-  if (!arrow) {
-    return;
+  const mergeBtn = [...document.querySelectorAll("button")].find(e => e.textContent.includes("Merge pull request"));
+  if (mergeBtn && !mergeBtn.textContent.toLowerCase().includes("squash")) {
+    mergeBtn.textContent += " (⚠️ NOT SQUASH)";
+    clearInterval(intervalId);
   }
-
-  arrow.closest("button").click();
-  clearInterval(intervalId);
-  const intervalId2 = setInterval(() => {
-    const squash = [...document.querySelectorAll("span")]
-      .find(e => e.textContent.includes("from this branch will be combined into one commit in the base branch"));
-    if (squash) {
-      squash.click();
-      clearInterval(intervalId2);
-    }
-  }, 20);
 }, 1_000);
 
 const findMergeButtons = () =>
