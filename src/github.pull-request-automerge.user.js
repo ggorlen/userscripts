@@ -37,13 +37,13 @@ var tid = setInterval(() => {
 }, 3000);
 */
 
-const intervalId = setInterval(() => {
-  const mergeBtn = [...document.querySelectorAll("button")].find(e => e.textContent.includes("Merge pull request"));
-  if (mergeBtn && !mergeBtn.textContent.toLowerCase().includes("squash")) {
-    mergeBtn.textContent += " (⚠️ NOT SQUASH)";
-    clearInterval(intervalId);
-  }
-}, 1_000);
+//const intervalId = setInterval(() => {
+//  const mergeBtn = [...document.querySelectorAll("button")].find(e => e.textContent.includes("Merge pull request"));
+//  if (mergeBtn && !mergeBtn.textContent.toLowerCase().includes("squash")) {
+//    mergeBtn.textContent += " (⚠️ NOT SQUASH)";
+//    //clearInterval(intervalId);
+//  }
+//}, 500);
 
 const findMergeButtons = () =>
   [...document.querySelectorAll("button")]
