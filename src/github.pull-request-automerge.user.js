@@ -37,14 +37,23 @@ var tid = setInterval(() => {
 }, 3000);
 */
 
-setTimeout(() => {
-  document.querySelector("#_r_6v_").click();
-  setTimeout(() => {
-    [...document.querySelectorAll("span")]
-      .find(e => e.textContent.includes("from this branch will be combined into one commit in the base branch"))
-      .click();
-  }, 200);
-}, 2_000);
+const intervalId = setInterval(() => {
+  const arrow = document.querySelector('[data-testid="mergebox-partial"] .octicon.octicon-triangle-down');
+  if (!arrow) {
+    return;
+  }
+
+  arrow.closest("button").click();
+  clearInterval(intervalId);
+  const intervalId2 = setInterval(() => {
+    const squash = [...document.querySelectorAll("span")]
+      .find(e => e.textContent.includes("from this branch will be combined into one commit in the base branch"));
+    if (squash) {
+      squash.click();
+      clearInterval(intervalId2);
+    }
+  }, 20);
+}, 1_000);
 
 const findMergeButtons = () =>
   [...document.querySelectorAll("button")]
