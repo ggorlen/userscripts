@@ -2,9 +2,9 @@
 // @name         Auto merge on GitHub
 // @namespace    http://tampermonkey.net/
 // @version      2024-12-19
-// @description  merge PR when CI finishes
+// @description  merge PR when CI finishes, prefer squash
 // @author       ggorlen
-// @match        https://github.com/comulate/comulate/pull*
+// @match        https://github.com/*/*/pull*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=github.com
 // @grant        none
 // ==/UserScript==
@@ -36,6 +36,17 @@ var tid = setInterval(() => {
   }
 }, 3000);
 */
+
+setTimeout(() => {
+  document.querySelector("#_r_6v_").click();
+  
+  
+  setTimeout(() => {
+    [...document.querySelectorAll("span")]
+      .find(e => e.textContent.includes("from this branch will be combined into one commit in the base branch"))
+      .click();
+  }, 200);
+}, 2_000);
 
 const findMergeButtons = () =>
   [...document.querySelectorAll("button")]
