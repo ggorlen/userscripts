@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.1
 // @description  Make YT less suck
-// @author       You
+// @author       ggorlen
 // @match        https://www.youtube.com/watch*
 // @grant        none
 // ==/UserScript==
@@ -37,6 +37,11 @@
       // hide yt logo
       selector: () => document.querySelector("#logo"),
       onFound: el => (el.style.display = "none")
+    },
+    {
+      // remove join/sub, like and sidebar
+      selector: () => document.querySelectorAll("#sponsor-button, #purchase-button, #analytics-button, #subscribe-button, ytd-menu-renderer, #secondary"),
+      onFound: els => els.forEach(el => el.remove())
     },
     {
       // click through promo
