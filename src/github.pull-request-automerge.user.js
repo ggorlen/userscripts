@@ -2,9 +2,9 @@
 // @name         Auto merge on GitHub
 // @namespace    http://tampermonkey.net/
 // @version      2024-12-19
-// @description  merge PR when CI finishes
+// @description  merge PR when CI finishes, prefer squash
 // @author       ggorlen
-// @match        https://github.com/comulate/comulate/pull*
+// @match        https://github.com/*/*/pull*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=github.com
 // @grant        none
 // ==/UserScript==
@@ -36,6 +36,14 @@ var tid = setInterval(() => {
   }
 }, 3000);
 */
+
+//const intervalId = setInterval(() => {
+//  const mergeBtn = [...document.querySelectorAll("button")].find(e => e.textContent.includes("Merge pull request"));
+//  if (mergeBtn && !mergeBtn.textContent.toLowerCase().includes("squash")) {
+//    mergeBtn.textContent += " (⚠️ NOT SQUASH)";
+//    //clearInterval(intervalId);
+//  }
+//}, 500);
 
 const findMergeButtons = () =>
   [...document.querySelectorAll("button")]
