@@ -19,6 +19,8 @@
 // - https://www.discogs.com/release/1081405-Lou-Reed-Street-Hassle
 // - https://www.discogs.com/release/35023970-Fleshwater-2000-In-Search-Of-The-Endless-Sky
 // - https://www.discogs.com/release/13858581-Mitchell-W-Feldstein-Pretty-Boss
+// - https://www.discogs.com/master/2490406-Dieterich-Buxtehude-Lars-Ulrik-Mortensen-Harpsichord-Music-Vol3
+// - https://www.discogs.com/master/3773732-Girolamo-Frescobaldi-Sergio-Vartolo-Keyboard-Music-Fantasie-Book-I-Ricercari-Canzoni-Francesi
 //
 // TODO:
 // - 1-click list removal
@@ -377,3 +379,20 @@ document.addEventListener("DOMContentLoaded", () => {
   addAddToListButton();
   setTimeout(addTotalDurationToPage, 500);
 });
+
+Object.defineProperty(window, "onbeforeunload", {
+  configurable: true,
+  get() { return null; },
+  set(fn) {
+    console.log("Blocked onbeforeunload:", fn);
+  }
+});
+
+const originalAddEventListener = window.addEventListener;
+window.addEventListener = function(type, listener, options) {
+  if (type === "beforeunload") {
+    console.log("Blocked beforeunload listener:", listener);
+    return;
+  }
+  return originalAddEventListener.call(this, type, listener, options);
+};
