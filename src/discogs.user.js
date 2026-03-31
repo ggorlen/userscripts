@@ -16,6 +16,7 @@
 //   - https://www.discogs.com/master/261660-Spocks-Beard-V
 //   - https://www.discogs.com/master/10291-Ulver-Perdition-City-Music-To-An-Interior-Film
 //   - https://www.discogs.com/master/3755-Nine-Inch-Nails-Further-Down-The-Spiral
+//   - https://www.discogs.com/master/47683-Billy-Cobham-Crosswinds
 // - https://www.discogs.com/release/1081405-Lou-Reed-Street-Hassle
 // - https://www.discogs.com/release/35023970-Fleshwater-2000-In-Search-Of-The-Endless-Sky
 // - https://www.discogs.com/release/13858581-Mitchell-W-Feldstein-Pretty-Boss
@@ -23,11 +24,16 @@
 // - https://www.discogs.com/master/3773732-Girolamo-Frescobaldi-Sergio-Vartolo-Keyboard-Music-Fantasie-Book-I-Ricercari-Canzoni-Francesi
 //
 // TODO:
+// - show which song is playing in youtube player and add indexes to each video thumbnail detail
+// - move title/artist into pasted chunk
 // - 1-click list removal
-// - auto-remove dead videos
-// - speed up adding tracklist count
-// - add support for trying to find a full album first, then fallback on provided
+// - auto-remove dead videos upon entering video screen (https://i.ytimg.com/vi/LWIgb1zhOoA/default.jpg pixel comparison is the only way to determine removal? example: https://www.discogs.com/release/5200196-/videos/update)
+// - improve 'mark listened' error handling
+// - button to remove all videos across all pages
+// - speed up adding tracklist count and other timeouts
+// - add support for trying to find a full album first, then fallback on provided (or vice versa)
 // - autoplay, requires changing browser flag
+// - detect when all videos look correct and put a checkmark
 
 const pasteFlag = "::PASTEFLAG::";
 const handlePaste = e => {
@@ -284,6 +290,10 @@ a[href="/lists"],
 #master-actions {
   display: none !important;
 }
+
+[class*='video_'][class*='active_'] {
+  background: #bbb;
+}
 </style>`;
   (document.head || document.documentElement).insertAdjacentHTML(
     "beforeend",
@@ -373,26 +383,75 @@ const addAddToListButton = () => {
   })();
 };
 
+const updateCurrentVideoCount = () => {
+  const currentVideos = [
+    ...document.querySelectorAll("h2,h1,h3,h4"),
+  ].find(e => e.textContent.startsWith("Current Videos"));
+  const count =
+    currentVideos.parentNode?.parentNode.querySelectorAll(
+      "li"
+    ).length;
+  currentVideos.textContent = `Current Videos (${count})`;
+};
+
+const addRemoveAllVideosButton = () => {
+  const undoChangesButton = [
+    ...document.querySelectorAll("button"),
+  ].find(e => e.textContent === "Undo changes");
+  const removeAllVideosButton = document.createElement("button");
+  removeAllVideosButton.textContent =
+    "Remove All Videos (on this page)";
+  undoChangesButton.insertAdjacentElement(
+    "afterend",
+    removeAllVideosButton
+  );
+  removeAllVideosButton.addEventListener("click", event => {
+    [...document.querySelectorAll("button")].forEach(e => {
+      if (e.textContent === "Remove") {
+        e.click();
+      }
+    });
+  });
+};
+
 addStyleSheet();
 document.addEventListener("DOMContentLoaded", () => {
   document.body.addEventListener("paste", handlePaste);
   addAddToListButton();
+  setTimeout(addRemoveAllVideosButton, 500);
   setTimeout(addTotalDurationToPage, 500);
+  setTimeout(updateCurrentVideoCount, 500);
+  setTimeout(() => {
+    if (document.body.textContent.includes("Current Videos")) {
+      document.body.addEventListener(
+        "click",
+        updateCurrentVideoCount
+      );
+    }
+  }, 1000);
 });
 
 Object.defineProperty(window, "onbeforeunload", {
   configurable: true,
-  get() { return null; },
+  get() {
+    return null;
+  },
   set(fn) {
     console.log("Blocked onbeforeunload:", fn);
-  }
+  },
 });
 
 const originalAddEventListener = window.addEventListener;
-window.addEventListener = function(type, listener, options) {
+window.addEventListener = function (type, listener, options) {
   if (type === "beforeunload") {
     console.log("Blocked beforeunload listener:", listener);
     return;
   }
-  return originalAddEventListener.call(this, type, listener, options);
+  return originalAddEventListener.call(
+    this,
+    type,
+    listener,
+    options
+  );
 };
+
