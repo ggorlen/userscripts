@@ -27,7 +27,8 @@
 // - https://www.discogs.com/master/3773732-Girolamo-Frescobaldi-Sergio-Vartolo-Keyboard-Music-Fantasie-Book-I-Ricercari-Canzoni-Francesi
 //
 // TODO:
-// - show which song is playing in youtube player and add indexes to each video thumbnail detail
+// - add indexes to each video thumbnail detail
+// - scroll into view whatever video is playing currently
 // - move title/artist into pasted chunk
 // - 1-click list removal
 // - auto-remove dead videos upon entering video screen (https://i.ytimg.com/vi/LWIgb1zhOoA/default.jpg pixel comparison is the only way to determine removal?
@@ -422,6 +423,56 @@ const addRemoveAllVideosButton = () => {
   });
 };
 
+const showTrackInfo = () => {
+  const container = document.querySelector("#release-videos");
+  if (!container) {
+    return;
+  }
+  const h2 = container.querySelector("h2");
+  h2.style.whiteSpace = "nowrap";
+  h2.style.overflowX = "auto";
+  h2.style.overflowY = "hidden";
+
+  function updateTrack() {
+    const buttons = [
+      ...container.querySelectorAll(".video_oIeBc"),
+    ];
+    const activeIndex = buttons.findIndex(b =>
+      b.classList.contains("active_qMExk")
+    );
+
+    if (activeIndex === -1) return;
+
+    const total = buttons.length;
+    const title = buttons[activeIndex]
+      .querySelector(".title_mKopo")
+      ?.textContent.trim();
+
+    h2.textContent = `${activeIndex + 1}/${total}: ${title}`;
+  }
+
+  updateTrack();
+
+  const observer = new MutationObserver(mutations => {
+    for (const m of mutations) {
+      if (
+        m.type === "attributes" &&
+        m.attributeName === "class" &&
+        m.target.classList.contains("video_oIeBc")
+      ) {
+        updateTrack();
+        break;
+      }
+    }
+  });
+
+  observer.observe(container, {
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+};
+
 addStyleSheet();
 document.addEventListener("DOMContentLoaded", () => {
   document.body.addEventListener("paste", handlePaste);
@@ -437,6 +488,7 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     }
   }, 1000);
+  showTrackInfo();
 });
 
 Object.defineProperty(window, "onbeforeunload", {
