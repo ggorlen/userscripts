@@ -11,12 +11,15 @@
 // ==/UserScript==
 
 // Bugs:
-// - userscript should ignore parenthesis when counting tracks:
+// - userscript should (usually?) ignore parenthesis when counting tracks (we may need to accept that some of these are contradictory):
 //   - https://www.discogs.com/master/420260-Bach-Gubaidulina-Anne-Sophie-Mutter-Violin-Concertos-In-Tempus-Praesens
 //   - https://www.discogs.com/master/261660-Spocks-Beard-V
 //   - https://www.discogs.com/master/10291-Ulver-Perdition-City-Music-To-An-Interior-Film
 //   - https://www.discogs.com/master/3755-Nine-Inch-Nails-Further-Down-The-Spiral
 //   - https://www.discogs.com/master/47683-Billy-Cobham-Crosswinds
+//   - https://www.discogs.com/master/52092-Dream-Theater-Metropolis-Pt-2-Scenes-From-A-Memory
+//   - https://www.discogs.com/release/1348353-Nimal-Nimal
+//   - https://www.discogs.com/master/39558-Art-Zoyd-Phase-IV
 // - https://www.discogs.com/release/1081405-Lou-Reed-Street-Hassle
 // - https://www.discogs.com/release/35023970-Fleshwater-2000-In-Search-Of-The-Endless-Sky
 // - https://www.discogs.com/release/13858581-Mitchell-W-Feldstein-Pretty-Boss
@@ -27,12 +30,16 @@
 // - show which song is playing in youtube player and add indexes to each video thumbnail detail
 // - move title/artist into pasted chunk
 // - 1-click list removal
-// - auto-remove dead videos upon entering video screen (https://i.ytimg.com/vi/LWIgb1zhOoA/default.jpg pixel comparison is the only way to determine removal? example: https://www.discogs.com/release/5200196-/videos/update)
+// - auto-remove dead videos upon entering video screen (https://i.ytimg.com/vi/LWIgb1zhOoA/default.jpg pixel comparison is the only way to determine removal?
+//     - example: https://www.discogs.com/release/5200196-/videos/update
+//     - example: https://www.discogs.com/release/4312623-/videos/update
+//     - example: https://www.discogs.com/release/48268-/videos/update
 // - improve 'mark listened' error handling
 // - button to remove all videos across all pages
 // - speed up adding tracklist count and other timeouts
 // - add support for trying to find a full album first, then fallback on provided (or vice versa)
 // - autoplay, requires changing browser flag
+// - could add unit/e2e tests with playwright for computing times properly on weird edge cases
 // - detect when all videos look correct and put a checkmark
 
 const pasteFlag = "::PASTEFLAG::";
@@ -286,6 +293,7 @@ a[href="/sell/cart"],
 a[href="/lists"],
 #release-actions,
 #audio,
+#esi-footer-root,
 #shopping-box-host,
 #master-actions {
   display: none !important;
