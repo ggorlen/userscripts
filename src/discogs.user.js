@@ -355,19 +355,17 @@ const addToListened = async () => {
 
     const data = await response.json();
 
-    if (response.ok && !data.errors) {
-      console.log(
-        `Added release ${releaseId} to 'listened' list`
-      );
-    } else {
+    if (!response.ok || data.errors) {
       console.error("Discogs API error:", data);
       alert("Failed to add — check console for details");
+      return false;
     }
 
     return data;
   } catch (err) {
     console.error("Unexpected error:", err);
     alert("Something went wrong — see console");
+    return false;
   }
 };
 
