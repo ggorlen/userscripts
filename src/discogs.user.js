@@ -11,20 +11,37 @@
 // ==/UserScript==
 
 // Bugs:
-// - userscript should ignore parenthesis when counting tracks:
+// - userscript should (usually?) ignore parenthesis when counting tracks (we may need to accept that some of these are contradictory):
 //   - https://www.discogs.com/master/420260-Bach-Gubaidulina-Anne-Sophie-Mutter-Violin-Concertos-In-Tempus-Praesens
 //   - https://www.discogs.com/master/261660-Spocks-Beard-V
 //   - https://www.discogs.com/master/10291-Ulver-Perdition-City-Music-To-An-Interior-Film
 //   - https://www.discogs.com/master/3755-Nine-Inch-Nails-Further-Down-The-Spiral
+//   - https://www.discogs.com/master/47683-Billy-Cobham-Crosswinds
+//   - https://www.discogs.com/master/52092-Dream-Theater-Metropolis-Pt-2-Scenes-From-A-Memory
+//   - https://www.discogs.com/release/1348353-Nimal-Nimal
+//   - https://www.discogs.com/master/39558-Art-Zoyd-Phase-IV
 // - https://www.discogs.com/release/1081405-Lou-Reed-Street-Hassle
 // - https://www.discogs.com/release/35023970-Fleshwater-2000-In-Search-Of-The-Endless-Sky
 // - https://www.discogs.com/release/13858581-Mitchell-W-Feldstein-Pretty-Boss
+// - https://www.discogs.com/master/2490406-Dieterich-Buxtehude-Lars-Ulrik-Mortensen-Harpsichord-Music-Vol3
+// - https://www.discogs.com/master/3773732-Girolamo-Frescobaldi-Sergio-Vartolo-Keyboard-Music-Fantasie-Book-I-Ricercari-Canzoni-Francesi
 //
 // TODO:
+// - add indexes to each video thumbnail detail
+// - scroll into view whatever video is playing currently
+// - move title/artist into pasted chunk
 // - 1-click list removal
-// - speed up adding tracklist count
-// - add support for trying to find a full album first, then fallback on provided
+// - auto-remove dead videos upon entering video screen (https://i.ytimg.com/vi/LWIgb1zhOoA/default.jpg pixel comparison is the only way to determine removal?
+//     - example: https://www.discogs.com/release/5200196-/videos/update
+//     - example: https://www.discogs.com/release/4312623-/videos/update
+//     - example: https://www.discogs.com/release/48268-/videos/update
+// - improve 'mark listened' error handling
+// - button to remove all videos across all pages
+// - speed up adding tracklist count and other timeouts
+// - add support for trying to find a full album first, then fallback on provided (or vice versa)
 // - autoplay, requires changing browser flag
+// - could add unit/e2e tests with playwright for computing times properly on weird edge cases
+// - detect when all videos look correct and put a checkmark
 
 const pasteFlag = "::PASTEFLAG::";
 const handlePaste = e => {
@@ -123,10 +140,10 @@ const addVideosFromYouTube = async titles => {
       e => e.textContent
     );
     findButtonByText("Search").click();
-
+    await new Promise(r => setTimeout(r, 500));
     await new Promise(resolve => {
       let iterations = 100;
-      (function poll() {
+      const intervalId = setInterval(() => {
         const videos = getVideos().map(e => e.textContent);
 
         if (videos.length !== videosBeforeSearching.length) {
@@ -135,16 +152,16 @@ const addVideosFromYouTube = async titles => {
 
         for (const [i, e] of videos.entries()) {
           if (e !== videosBeforeSearching[i]) {
+            clearInterval(intervalId);
             return resolve();
           }
         }
 
         if (--iterations < 0) {
+          clearInterval(intervalId);
           return resolve();
         }
-
-        return requestAnimationFrame(poll);
-      })();
+      }, 20);
     });
     const videos = getVideos();
     let bestMatch = null;
@@ -278,8 +295,14 @@ a[href="/sell/cart"],
 a[href="/lists"],
 #release-actions,
 #audio,
+#esi-footer-root,
+#shopping-box-host,
 #master-actions {
   display: none !important;
+}
+
+[class*='video_'][class*='active_'] {
+  background: #bbb;
 }
 </style>`;
   (document.head || document.documentElement).insertAdjacentHTML(
@@ -333,19 +356,17 @@ const addToListened = async () => {
 
     const data = await response.json();
 
-    if (response.ok && !data.errors) {
-      console.log(
-        `Added release ${releaseId} to 'listened' list`
-      );
-    } else {
+    if (!response.ok || data.errors) {
       console.error("Discogs API error:", data);
       alert("Failed to add — check console for details");
+      return false;
     }
 
     return data;
   } catch (err) {
     console.error("Unexpected error:", err);
     alert("Something went wrong — see console");
+    return false;
   }
 };
 
@@ -370,10 +391,126 @@ const addAddToListButton = () => {
   })();
 };
 
+const updateCurrentVideoCount = () => {
+  const currentVideos = [
+    ...document.querySelectorAll("h2,h1,h3,h4"),
+  ].find(e => e.textContent.startsWith("Current Videos"));
+  const count =
+    currentVideos.parentNode?.parentNode.querySelectorAll(
+      "li"
+    ).length;
+  currentVideos.textContent = `Current Videos (${count})`;
+};
+
+const addRemoveAllVideosButton = () => {
+  const undoChangesButton = [
+    ...document.querySelectorAll("button"),
+  ].find(e => e.textContent === "Undo changes");
+  const removeAllVideosButton = document.createElement("button");
+  removeAllVideosButton.textContent =
+    "Remove All Videos (on this page)";
+  undoChangesButton.insertAdjacentElement(
+    "afterend",
+    removeAllVideosButton
+  );
+  removeAllVideosButton.addEventListener("click", event => {
+    [...document.querySelectorAll("button")].forEach(e => {
+      if (e.textContent === "Remove") {
+        e.click();
+      }
+    });
+  });
+};
+
+const showTrackInfo = () => {
+  const container = document.querySelector("#release-videos");
+  if (!container) {
+    return;
+  }
+  const h2 = container.querySelector("h2");
+  h2.style.whiteSpace = "nowrap";
+  h2.style.overflowX = "auto";
+  h2.style.overflowY = "hidden";
+
+  function updateTrack() {
+    const buttons = [
+      ...container.querySelectorAll(".video_oIeBc"),
+    ];
+    const activeIndex = buttons.findIndex(b =>
+      b.classList.contains("active_qMExk")
+    );
+
+    if (activeIndex === -1) return;
+
+    const total = buttons.length;
+    const title = buttons[activeIndex]
+      .querySelector(".title_mKopo")
+      ?.textContent.trim();
+
+    h2.textContent = `${activeIndex + 1}/${total}: ${title}`;
+  }
+
+  updateTrack();
+
+  const observer = new MutationObserver(mutations => {
+    for (const m of mutations) {
+      if (
+        m.type === "attributes" &&
+        m.attributeName === "class" &&
+        m.target.classList.contains("video_oIeBc")
+      ) {
+        updateTrack();
+        break;
+      }
+    }
+  });
+
+  observer.observe(container, {
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+};
+
 addStyleSheet();
 document.addEventListener("DOMContentLoaded", () => {
   document.body.addEventListener("paste", handlePaste);
-  addTotalDurationToPage();
   addAddToListButton();
+  setTimeout(addRemoveAllVideosButton, 500);
+  setTimeout(addTotalDurationToPage, 500);
+  setTimeout(updateCurrentVideoCount, 500);
+  setTimeout(() => {
+    if (document.body.textContent.includes("Current Videos")) {
+      document.body.addEventListener(
+        "click",
+        updateCurrentVideoCount
+      );
+    }
+  }, 1000);
+  showTrackInfo();
 });
+
+Object.defineProperty(window, "onbeforeunload", {
+  configurable: true,
+  get() {
+    return null;
+  },
+  set(fn) {
+    console.log("Blocked onbeforeunload:", fn);
+  },
+});
+
+const originalAddEventListener = window.addEventListener;
+window.addEventListener = function (type, listener, options) {
+  if (type === "beforeunload") {
+    console.log("Blocked beforeunload listener:", listener);
+    return;
+  }
+  return originalAddEventListener.call(
+    this,
+    type,
+    listener,
+    options
+  );
+};
 

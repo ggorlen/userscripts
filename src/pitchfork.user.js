@@ -39,7 +39,7 @@
     document.querySelectorAll("#video-container, aside").forEach(e => e.remove());
     document.querySelectorAll("video").forEach(e => e.remove());
 
-    document.querySelectorAll("img[src$='.gif']").forEach(img => {
+    document.querySelectorAll("img[src*='.gif']").forEach(img => {
       if (img.complete) {
         freezeGif(img);
       } else {
