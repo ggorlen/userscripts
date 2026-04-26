@@ -265,6 +265,7 @@ const addTotalDurationToPage = () => {
 const addStyleSheet = () => {
   const css = `<style>
 footer,
+#esi-footer-root,
 .side_3-xID > .wrapper_cGBtH > .buttons_2jlYL,
 .side_3-xID .report_3dOkc,
 .wrapper_3ECKE,
