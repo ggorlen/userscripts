@@ -474,6 +474,11 @@ const showTrackInfo = () => {
 
 addStyleSheet();
 document.addEventListener("DOMContentLoaded", () => {
+  document.body.addEventListener("keydown", event => {
+    if (event.key === "e" && event.ctrlKey) {
+      document.querySelector("[href*='/videos/update']").click();
+    }
+  });
   document.body.addEventListener("paste", handlePaste);
   addAddToListButton();
   setTimeout(addRemoveAllVideosButton, 500);
