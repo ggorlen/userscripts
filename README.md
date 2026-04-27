@@ -25,3 +25,4 @@
 
 - userscript for github to auto commit on certain file paths when editing in browser
 - Fix github userscript squash merge by default which doesn't really work yet
+- google voice auto-click confirmation on deletes
