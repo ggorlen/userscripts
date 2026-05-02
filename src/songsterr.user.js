@@ -12,15 +12,15 @@
 const removeElementsExcept = currentElement => {
   while (currentElement && currentElement !== document.body) {
     const parent = currentElement.parentNode;
-
     for (let i = parent.children.length - 1; i >= 0; i--) {
       const element = parent.children[i];
-
-      if (currentElement !== element) {
+      if (
+        currentElement !== element &&
+        element !== document.querySelector("#panel-artist")
+      ) {
         parent.removeChild(element);
       }
     }
-
     currentElement = parent;
   }
 };
@@ -29,6 +29,8 @@ const removeElementsExcept = currentElement => {
   new MutationObserver(mutations => {
     removeElementsExcept(document.querySelector("#tablature"));
   }).observe(document.body, {
-    childList: true, subtree: true, attributes: true
+    childList: true,
+    subtree: true,
+    attributes: true,
   });
 })();
