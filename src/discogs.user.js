@@ -282,6 +282,7 @@ const addTotalDurationToPage = () => {
 const addStyleSheet = () => {
   const css = `<style>
 footer,
+#esi-footer-root,
 .side_3-xID > .wrapper_cGBtH > .buttons_2jlYL,
 .side_3-xID .report_3dOkc,
 .wrapper_3ECKE,
@@ -473,6 +474,11 @@ const showTrackInfo = () => {
 
 addStyleSheet();
 document.addEventListener("DOMContentLoaded", () => {
+  document.body.addEventListener("keydown", event => {
+    if (event.key === "e" && event.ctrlKey) {
+      document.querySelector("[href*='/videos/update']").click();
+    }
+  });
   document.body.addEventListener("paste", handlePaste);
   addAddToListButton();
   setTimeout(addRemoveAllVideosButton, 500);

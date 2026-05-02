@@ -21,3 +21,8 @@
 - [Glitch Vim](https://glitch-userscripts.glitch.me/glitch-vim.user.js)
 - [CertainPerformance's SE userscripts](https://github.com/CertainPerformance/Stack-Exchange-Userscripts)
 
+## TODO
+
+- userscript for github to auto commit on certain file paths when editing in browser
+- Fix github userscript squash merge by default which doesn't really work yet
+- google voice auto-click confirmation on deletes
