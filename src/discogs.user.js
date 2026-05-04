@@ -479,6 +479,17 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelector("[href*='/videos/update']").click();
     }
   });
+  setTimeout(() => {
+    const rating = document.querySelector(
+      "[title='Rate this release 1 star']"
+    );
+    rating?.closest("aside").remove();
+    const addToCollectionBtn = [
+      ...document.querySelectorAll("button"),
+    ].find(e => e.textContent.trim() === "Add to Collection");
+    addToCollectionBtn?.closest("aside").remove();
+  }, 500);
+
   document.body.addEventListener("paste", handlePaste);
   addAddToListButton();
   setTimeout(addRemoveAllVideosButton, 500);
