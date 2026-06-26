@@ -14,6 +14,7 @@
 - [stack-exchange](src/stack-exchange.user.js): hides noisy features, adds one-click votes
 - ~~[udacity](src/udacity.user.js): automatically clicks through 5-second wait between videos~~
 - [weather](src/weather.user.js): removes ads and noise
+- [ultimate-guitar](src/ultimate-guitar.user.js): removes everything but the tab
 - [yt](src/yt.user.js): hides sidebar recommendations and comments
 
 ## Useful scripts by others
