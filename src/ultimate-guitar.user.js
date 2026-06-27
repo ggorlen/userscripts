@@ -24,6 +24,17 @@
   const pre = code.querySelector("pre");
   pre.style.fontSize = "14pt";
   pre.style.lineHeight = "1.2";
+  document.body.style.color = "white";
   document.body.style.padding = "3em";
   document.body.innerHTML = code.outerHTML;
+})();
+
+const end = performance.now() + 5000;
+(function poll() {
+  [...document.querySelectorAll("head script, head style, iframe, head link")]
+    .forEach(e => e.remove());
+
+  if (performance.now() < end) {
+    requestAnimationFrame(poll);
+  }
 })();
