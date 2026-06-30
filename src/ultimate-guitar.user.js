@@ -38,3 +38,8 @@ const end = performance.now() + 5000;
     requestAnimationFrame(poll);
   }
 })();
+
+const observer = new MutationObserver((mutationList, observer) => {
+  document.querySelector("[style*='z-index: 10000']")?.remove();
+});
+observer.observe(document.body, {attributes: true, childList: true, subtree: true});
