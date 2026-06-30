@@ -14,6 +14,7 @@
 // - userscript should (usually?) ignore parenthesis when counting tracks (we may need to accept that some of these are contradictory):
 //   - https://www.discogs.com/master/420260-Bach-Gubaidulina-Anne-Sophie-Mutter-Violin-Concertos-In-Tempus-Praesens
 //   - https://www.discogs.com/master/261660-Spocks-Beard-V
+//   - https://www.discogs.com/master/1814878-Dennis-Johnson-November
 //   - https://www.discogs.com/master/10291-Ulver-Perdition-City-Music-To-An-Interior-Film
 //   - https://www.discogs.com/master/3755-Nine-Inch-Nails-Further-Down-The-Spiral
 //   - https://www.discogs.com/master/47683-Billy-Cobham-Crosswinds
@@ -288,6 +289,9 @@ footer,
 .wrapper_3ECKE,
 .ratings_1pAt8,
 #master-release-marketplace,
+[class*="side__"][style="order:2"],
+[class*="side__"][style="order:3"],
+[class*="side__"][style="order:5"],
 #release-contributors,
 #release-marketplace,
 .categoriesItem_S45kC,
@@ -479,6 +483,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelector("[href*='/videos/update']").click();
     }
   });
+
   setTimeout(() => {
     const rating = document.querySelector(
       "[title='Rate this release 1 star']"
@@ -492,9 +497,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.body.addEventListener("paste", handlePaste);
   addAddToListButton();
-  setTimeout(addRemoveAllVideosButton, 500);
+  addRemoveAllVideosButton();
   setTimeout(addTotalDurationToPage, 500);
+  setTimeout(addTotalDurationToPage, 2000);
   setTimeout(updateCurrentVideoCount, 500);
+  setTimeout(() => {
+    // expand the truncated lists
+    document.querySelector("[class*='showMore_']")?.click();
+  }, 1000);
+
+  setTimeout(() => {
+    // expand the Lists section if it's not already expanded
+    document.querySelector("[title='Toggle section'][aria-label='Expand section']")?.click();
+  }, 800);
+
   setTimeout(() => {
     if (document.body.textContent.includes("Current Videos")) {
       document.body.addEventListener(
