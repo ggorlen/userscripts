@@ -398,18 +398,23 @@ const addAddToListButton = () => {
 const updateCurrentVideoCount = () => {
   const currentVideos = [
     ...document.querySelectorAll("h2,h1,h3,h4"),
-  ].find(e => e.textContent.startsWith("Current Videos"));
+  ].find(e => e.textContent.startsWith("Videos"));
   const count =
-    currentVideos.parentNode?.parentNode.querySelectorAll(
+    currentVideos?.parentNode?.parentNode.querySelectorAll(
       "li"
     ).length;
-  currentVideos.textContent = `Current Videos (${count})`;
+  currentVideos.textContent = `Videos (${count})`;
 };
 
 const addRemoveAllVideosButton = () => {
   const undoChangesButton = [
     ...document.querySelectorAll("button"),
   ].find(e => e.textContent === "Undo changes");
+
+  if (!undoChangesButton) {
+    return;
+  }
+
   const removeAllVideosButton = document.createElement("button");
   removeAllVideosButton.textContent =
     "Remove All Videos (on this page)";
@@ -428,9 +433,11 @@ const addRemoveAllVideosButton = () => {
 
 const showTrackInfo = () => {
   const container = document.querySelector("#release-videos");
+
   if (!container) {
     return;
   }
+
   const h2 = container.querySelector("h2");
   h2.style.whiteSpace = "nowrap";
   h2.style.overflowX = "auto";
@@ -451,7 +458,7 @@ const showTrackInfo = () => {
       .querySelector(".title_mKopo")
       ?.textContent.trim();
 
-    h2.textContent = `${activeIndex + 1}/${total}: ${title}`;
+    h2.textContent = `Videos ${activeIndex + 1}/${total}: "${title}"`;
   }
 
   updateTrack();
@@ -501,15 +508,15 @@ document.addEventListener("DOMContentLoaded", () => {
   setTimeout(addTotalDurationToPage, 500);
   setTimeout(addTotalDurationToPage, 2000);
   setTimeout(updateCurrentVideoCount, 500);
-  setTimeout(() => {
-    // expand the truncated lists
-    document.querySelector("[class*='showMore_']")?.click();
-  }, 1000);
 
   setTimeout(() => {
     // expand the Lists section if it's not already expanded
-    document.querySelector("[title='Toggle section'][aria-label='Expand section']")?.click();
-  }, 800);
+    document.querySelector("[title='Toggle section'][aria-label='Expand section']")?.focus();
+  }, 1200);
+  setTimeout(() => {
+    // expand the truncated lists
+    document.querySelector("[class*='showMore_']")?.click();
+  }, 1300);
 
   setTimeout(() => {
     if (document.body.textContent.includes("Current Videos")) {
