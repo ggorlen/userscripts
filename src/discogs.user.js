@@ -398,12 +398,12 @@ const addAddToListButton = () => {
 const updateCurrentVideoCount = () => {
   const currentVideos = [
     ...document.querySelectorAll("h2,h1,h3,h4"),
-  ].find(e => e.textContent.startsWith("Videos"));
+  ].find(e => e.textContent.startsWith("Current Videos"));
   const count =
     currentVideos?.parentNode?.parentNode.querySelectorAll(
       "li"
     ).length;
-  currentVideos.textContent = `Videos (${count})`;
+  currentVideos.textContent = `Current Videos (${count})`;
 };
 
 const addRemoveAllVideosButton = () => {
