@@ -403,7 +403,10 @@ const updateCurrentVideoCount = () => {
     currentVideos?.parentNode?.parentNode.querySelectorAll(
       "li"
     ).length;
-  currentVideos.textContent = `Current Videos (${count})`;
+
+  if (currentVideos) {
+    currentVideos.textContent = `Current Videos (${count})`;
+  }
 };
 
 const addRemoveAllVideosButton = () => {
