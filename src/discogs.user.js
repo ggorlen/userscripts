@@ -362,7 +362,7 @@ const addToListened = async () => {
 
     if (!response.ok || data.errors) {
       console.error("Discogs API error:", data);
-      alert("Failed to add — check console for details");
+      alert("Failed to add — " + data.errors?.[0]?.message);
       return false;
     }
 
