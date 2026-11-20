@@ -45,6 +45,26 @@ var tid = setInterval(() => {
 //  }
 //}, 500);
 
+const NON_SQUASH_LABELS = new Set([
+  "merge pull request",
+  "rebase and merge",
+  "enable auto-merge",
+]);
+
+const warnNonSquashButtons = () => {
+  for (const label of document.querySelectorAll('button [data-component="text"]')) {
+    const raw = label.textContent.replace(/^⚠️\s*/, "").trim().toLowerCase();
+
+    if (NON_SQUASH_LABELS.has(raw) && !label.textContent.startsWith("⚠️")) {
+      label.textContent = `⚠️ ${label.textContent}`;
+    }
+  }
+};
+
+const nonSquashObserver = new MutationObserver(warnNonSquashButtons);
+nonSquashObserver.observe(document.body, { childList: true, subtree: true });
+warnNonSquashButtons();
+
 const findMergeButtons = () =>
   [...document.querySelectorAll("button")]
     //.reverse()
